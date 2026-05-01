@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quiz Creation and Visibility</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .test-result { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Quiz Creation and Visibility Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Mock localStorage and user functions
+        let mockLocalStorage = {};
+        
+        function mockSetItem(key, value) {
+            mockLocalStorage[key] = value;
+            localStorage.setItem(key, value);
+        }
+        
+        function mockGetItem(key) {
+            return mockLocalStorage[key] || localStorage.getItem(key);
+        }
+        
+        function mockGetCurrentUser() {
+            return { id: 'test_student_1', branch: 'COMPS', semester: 'Semester 3' };
+        }
+        
+        // Mock quiz creation function (simplified version of createQuiz)
+        function mockCreateQuiz(quizData) {
+            const quiz = {
+                id: 'quiz_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                name: quizData.name,
+                duration: quizData.duration,
+                branch: quizData.branch,
+                semester: quizData.semester,
+                subject: quizData.subject,
+                numQuestions: quizData.numQuestions,
+                setPaper: quizData.setPaper,
+                createdAt: new Date().toISOString(),
+                createdBy: mockGetCurrentUser().id,
+                questions: []
+            };
+            
+            // Save to localStorage
+            let quizzes = JSON.parse(mockGetItem('quizzes')) || [];
+            quizzes.push(quiz);
+            mockSetItem('quizzes', JSON.stringify(quizzes));
+            
+            return quiz;
+        }
+        
+        // Mock loadStudentQuizzes function (simplified version)
+        function mockLoadStudentQuizzes(filters = {}) {
+            const currentUser = mockGetCurrentUser();
+            let quizzes = JSON.parse(mockGetItem('quizzes')) || [];
+            
+            // Apply filters - students can only see quizzes that match their branch and semester
+            quizzes = quizzes.filter(quiz => {
+                const matchesBranch = !filters.branch || quiz.branch === filters.branch;
+                const matchesSemester = !filters.semester || quiz.semester === filters.semester;
+                const matchesSubject = !filters.subject || quiz.subject === filters.subject;
+                
+                // Additional safety: only show quizzes that match student's branch and semester
+                const matchesStudentBranch = !currentUser.branch || quiz.branch === currentUser.branch;
+                const matchesStudentSemester = !currentUser.semester || quiz.semester === currentUser.semester;
+                
+                return matchesBranch && matchesSemester && matchesSubject && matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            return quizzes;
+        }
+        
+        // Test functions
+        function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            let testsPassed = 0;
+            let totalTests = 0;
+            
+            function addTestResult(testName, passed, message) {
+                totalTests++;
+                if (passed) testsPassed++;
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'test-result';
+                resultDiv.innerHTML = `<span class="${passed ? 'pass' : 'fail'}">${passed ? '✓' : '✗'}</span> ${testName}: ${message}`;
+                resultsDiv.appendChild(resultDiv);
+            }
+            
+            // Clear localStorage before tests
+            localStorage.clear();
+            mockLocalStorage = {};
+            
+            // Test 1: Create a quiz and verify it exists in localStorage
+            const testQuiz = {
+                name: 'Test Quiz - Data Structures',
+                duration: 30,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 5,
+                setPaper: ''
+            };
+            
+            const createdQuiz = mockCreateQuiz(testQuiz);
+            const quizzesAfterCreation = JSON.parse(mockGetItem('quizzes')) || [];
+            
+            addTestResult(
+                'Quiz Creation',
+                quizzesAfterCreation.length === 1 && quizzesAfterCreation[0].id === createdQuiz.id,
+                `Created quiz with ID: ${createdQuiz.id}`
+            );
+            
+            // Test 2: Verify the quiz appears in student view (matching branch and semester)
+            const studentQuizzes = mockLoadStudentQuizzes();
+            addTestResult(
+                'Student View - Matching Criteria',
+                studentQuizzes.length === 1 && studentQuizzes[0].id === createdQuiz.id,
+                `Found ${studentQuizzes.length} quiz(es) for student with matching branch/semester`
+            );
+            
+            // Test 3: Verify quiz doesn't appear for wrong branch
+            const wrongBranchQuizzes = mockLoadStudentQuizzes({ branch: 'IT' });
+            addTestResult(
+                'Student View - Wrong Branch Filter',
+                wrongBranchQuizzes.length === 0,
+                `Found ${wrongBranchQuizzes.length} quiz(es) for wrong branch filter`
+            );
+            
+            // Test 4: Verify quiz appears with correct subject filter
+            const correctSubjectQuizzes = mockLoadStudentQuizzes({ subject: 'CSE' });
+            addTestResult(
+                'Student View - Correct Subject Filter',
+                correctSubjectQuizzes.length === 1 && correctSubjectQuizzes[0].id === createdQuiz.id,
+                `Found ${correctSubjectQuizzes.length} quiz(es) for correct subject filter`
+            );
+            
+            // Test 5: Create multiple quizzes and verify all appear
+            const secondQuiz = {
+                name: 'Test Quiz - Algorithms',
+                duration: 45,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 8,
+                setPaper: ''
+            };
+            
+            mockCreateQuiz(secondQuiz);
+            const multipleQuizzes = mockLoadStudentQuizzes();
+            addTestResult(
+                'Multiple Quizzes',
+                multipleQuizzes.length === 2,
+                `Found ${multipleQuizzes.length} quiz(es) after creating second quiz`
+            );
+            
+            // Summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.marginTop = '20px';
+            summaryDiv.style.fontWeight = 'bold';
+            summaryDiv.innerHTML = `<hr><br>Test Summary: ${testsPassed}/${totalTests} tests passed`;
+            summaryDiv.className = testsPassed === totalTests ? 'pass' : 'fail';
+            resultsDiv.appendChild(summaryDiv);
+            
+            // Show localStorage data
+            const dataDiv = document.createElement('div');
+            dataDiv.style.marginTop = '20px';
+            dataDiv.innerHTML = '<h3>Current localStorage Data:</h3><pre>' + JSON.stringify(JSON.parse(mockGetItem('quizzes') || '[]'), null, 2) + '</pre>';
+            resultsDiv.appendChild(dataDiv);
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

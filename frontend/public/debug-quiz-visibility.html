@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Quiz Visibility</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Debug Quiz Visibility</h1>
+    
+    <div class="debug-section">
+        <h2>1. Check Current User</h2>
+        <button onclick="checkCurrentUser()">Check Current User</button>
+        <div id="user-info"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. Create Test Quiz</h2>
+        <button onclick="createTestQuiz()">Create Test Quiz</button>
+        <div id="quiz-creation"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. Check All Quizzes</h2>
+        <button onclick="checkAllQuizzes()">Show All Quizzes</button>
+        <div id="all-quizzes"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. Simulate Student View</h2>
+        <button onclick="simulateStudentView()">Simulate Student View</button>
+        <div id="student-view"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>5. Clear Data</h2>
+        <button onclick="clearAllData()">Clear All Data</button>
+    </div>
+
+    <script>
+        // Mock functions from the main application
+        function getCurrentUser() {
+            try {
+                const userData = localStorage.getItem('currentUser');
+                return userData ? JSON.parse(userData) : null;
+            } catch (e) {
+                console.error('Error parsing current user:', e);
+                return null;
+            }
+        }
+        
+        function setCurrentUser(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+        }
+        
+        function getQuizzes() {
+            try {
+                const quizzesData = localStorage.getItem('quizzes');
+                return quizzesData ? JSON.parse(quizzesData) : [];
+            } catch (e) {
+                console.error('Error parsing quizzes:', e);
+                return [];
+            }
+        }
+        
+        function saveQuizzes(quizzes) {
+            localStorage.setItem('quizzes', JSON.stringify(quizzes));
+        }
+        
+        // Debug functions
+        function checkCurrentUser() {
+            const user = getCurrentUser();
+            const userInfo = document.getElementById('user-info');
+            
+            if (!user) {
+                userInfo.innerHTML = '<p class="error">No current user found!</p>';
+                return;
+            }
+            
+            userInfo.innerHTML = `
+                <p class="success">Current user found:</p>
+                <pre>${JSON.stringify(user, null, 2)}</pre>
+            `;
+        }
+        
+        function createTestQuiz() {
+            const user = getCurrentUser();
+            const quizCreation = document.getElementById('quiz-creation');
+            
+            if (!user) {
+                quizCreation.innerHTML = '<p class="error">No current user! Cannot create quiz.</p>';
+                return;
+            }
+            
+            const quiz = {
+                id: 'debug_quiz_' + Date.now(),
+                name: 'Debug Test Quiz - ' + new Date().toLocaleTimeString(),
+                duration: 30,
+                branch: user.branch || 'COMPS',
+                semester: user.semester || 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 5,
+                setPaper: '',
+                createdAt: new Date().toISOString(),
+                createdBy: user.id,
+                questions: [
+                    { question: "Test question 1?", options: ["A", "B", "C", "D"], correctAnswer: 0 },
+                    { question: "Test question 2?", options: ["A", "B", "C", "D"], correctAnswer: 1 }
+                ]
+            };
+            
+            const quizzes = getQuizzes();
+            quizzes.push(quiz);
+            saveQuizzes(quizzes);
+            
+            quizCreation.innerHTML = `
+                <p class="success">Quiz created successfully!</p>
+                <pre>${JSON.stringify(quiz, null, 2)}</pre>
+            `;
+        }
+        
+        function checkAllQuizzes() {
+            const quizzes = getQuizzes();
+            const allQuizzesDiv = document.getElementById('all-quizzes');
+            
+            if (quizzes.length === 0) {
+                allQuizzesDiv.innerHTML = '<p class="error">No quizzes found in system!</p>';
+                return;
+            }
+            
+            allQuizzesDiv.innerHTML = `
+                <p class="info">Found ${quizzes.length} quiz(es) in system:</p>
+                ${quizzes.map(quiz => `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd;">
+                        <strong>${quiz.name}</strong><br>
+                        ID: ${quiz.id}<br>
+                        Branch: ${quiz.branch} | Semester: ${quiz.semester}<br>
+                        Subject: ${quiz.subject}<br>
+                        Created by: ${quiz.createdBy}<br>
+                        Created at: ${new Date(quiz.createdAt).toLocaleString()}
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function simulateStudentView() {
+            const user = getCurrentUser();
+            const studentViewDiv = document.getElementById('student-view');
+            
+            if (!user) {
+                studentViewDiv.innerHTML = '<p class="error">No current user!</p>';
+                return;
+            }
+            
+            const allQuizzes = getQuizzes();
+            
+            // Apply the same filtering logic as loadStudentQuizzes
+            const filteredQuizzes = allQuizzes.filter(quiz => {
+                const matchesStudentBranch = !user.branch || quiz.branch === user.branch;
+                const matchesStudentSemester = !user.semester || quiz.semester === user.semester;
+                
+                return matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            studentViewDiv.innerHTML = `
+                <p class="info">Student view filtering results:</p>
+                <p>User branch: ${user.branch || 'N/A'} | User semester: ${user.semester || 'N/A'}</p>
+                <p>Total quizzes in system: ${allQuizzes.length}</p>
+                <p>Quizzes visible to student: ${filteredQuizzes.length}</p>
+                
+                ${filteredQuizzes.length > 0 ? `
+                    <p class="success">Visible quizzes:</p>
+                    ${filteredQuizzes.map(quiz => `
+                        <div style="margin: 5px 0; padding: 5px; background: #e8f5e8;">
+                            <strong>${quiz.name}</strong> (Created by: ${quiz.createdBy})
+                        </div>
+                    `).join('')}
+                ` : '<p class="error">No quizzes visible to student!</p>'}
+                
+                ${allQuizzes.length > filteredQuizzes.length ? `
+                    <p class="error">Hidden quizzes (wrong branch/semester):</p>
+                    ${allQuizzes.filter(quiz => !filteredQuizzes.includes(quiz)).map(quiz => `
+                        <div style="margin: 5px 0; padding: 5px; background: #ffeaea;">
+                            <strong>${quiz.name}</strong> (Branch: ${quiz.branch}, Semester: ${quiz.semester})
+                        </div>
+                    `).join('')}
+                ` : ''}
+            `;
+        }
+        
+        function clearAllData() {
+            localStorage.removeItem('quizzes');
+            localStorage.removeItem('currentUser');
+            alert('All data cleared!');
+            location.reload();
+        }
+        
+        // Auto-run checks on page load
+        window.onload = function() {
+            console.log('Debug page loaded');
+            
+            // Check if we have a current user, if not create a mock one
+            const user = getCurrentUser();
+            if (!user) {
+                console.log('Creating mock teacher user for testing');
+                const mockTeacher = {
+                    id: 'teacher_debug_001',
+                    name: 'Debug Teacher',
+                    email: 'debug@teacher.com',
+                    role: 'teacher',
+                    branch: 'COMPS',
+                    semester: 'Semester 3'
+                };
+                setCurrentUser(mockTeacher);
+                alert('Created mock teacher user for testing');
+            }
+            
+            checkCurrentUser();
+        };
+    </script>
+</body>
+</html>

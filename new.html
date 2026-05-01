@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassReconnect Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for webkit browsers */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 2px;
+        }
+        .quiz-option:hover {
+            background-color: #f0f4ff;
+        }
+        .quiz-option input:checked + label {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col fixed h-full sidebar-scroll overflow-y-auto z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+            <!-- Logo -->
+            <div class="flex items-center justify-between p-4 border-b border-slate-700">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 h-8 w-8 mr-2"><path d="M12 22h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h2"></path><path d="M10 18a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"></path><path d="M2 6h4"></path><path d="M2 10h4"></path><path d="M2 14h4"></path></svg>
+                    <h1 class="text-xl font-bold">ClassReconnect</h1>
+                </div>
+                <button id="sidebar-close" class="lg:hidden p-1 text-slate-400 hover:text-white">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav id="main-nav" class="flex-1 px-4 py-4 space-y-2">
+                <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Navigation</p>
+                <a href="#dashboard" class="flex items-center px-4 py-2 text-sm font-medium bg-slate-700 text-blue-300 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+                    Dashboard
+                </a>
+                <a href="#library" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Library
+                </a>
+                <a href="#qa" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Q&A
+                </a>
+                <a href="#quizzes" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                    Quizzes
+                </a>
+            </nav>
+
+            <!-- Profile Footer -->
+            <div class="p-4 mt-auto border-t border-slate-700">
+                <div class="flex items-center">
+                    <a href="#profile" class="inline-block">
+                        <img id="profile-avatar" class="h-10 w-10 rounded-full cursor-pointer" src="https://placehold.co/100x100/7c3aed/ffffff?text=SU" alt="User Avatar">
+                    </a>
+                    <div class="ml-3">
+                        <p id="profile-name" class="text-sm font-medium text-white">Student User</p>
+                        <p id="profile-details" class="text-xs text-slate-400">COMPS • Semester 5</p>
+                    </div>
+                    <button class="ml-auto text-slate-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+                    </button>
+                </div>
+                
+                <button id="logout-button" class="w-full text-center mt-2 bg-slate-700 text-sm text-slate-200 py-2 rounded-lg hover:bg-slate-600 transition-colors">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:ml-64 flex-1 p-4 sm:p-6 lg:p-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div id="main-header" class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <!-- This content will be replaced by JavaScript -->
+                </div>
+
+                <!-- Page Content -->
+                <div id="dashboard-content">
+                    <!-- Dashboard Grid -->
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        <!-- Left/Center Column -->
+                        <div class="xl:col-span-2 space-y-6">
+                            <!-- Stats Cards -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div class="bg-white p-6 rounded-xl shadow-sm flex items-start justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-500">Resources Available</p>
+                                        <p id="dashboard-resource-count" class="text-4xl font-bold text-slate-800 mt-1">26</p>
+                                        <p class="text-xs text-green-500 font-semibold mt-2">+1 this week</p>
+                                    </div>
+                                    <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl shadow-sm flex items-start justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-500">Active Questions</p>
+                                        <p class="text-4xl font-bold text-slate-800 mt-1">0</p>
+                                        <p class="text-xs text-green-500 font-semibold mt-2">+8% today</p>
+                                    </div>
+                                    <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl shadow-sm flex items-start justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-500">Quizzes Taken</p>
+                                        <p class="text-4xl font-bold text-slate-800 mt-1">0</p>
+                                        <p class="text-xs text-slate-500 font-semibold mt-2">No new quizzes</p>
+                                    </div>
+                                    <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Resources Used -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-bold text-slate-800">Recent Resources Used</h3>
+                                    <a href="#library" class="text-sm font-semibold text-blue-600 hover:underline">View All →</a>
+                                </div>
+                                <div id="recent-resources-container" class="space-y-4">
+                                     <p class="text-slate-500">No resources viewed recently. Go to the library to start exploring!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            <!-- Profile Card -->
+                            <div class="bg-blue-600 text-white p-8 rounded-xl shadow-lg text-center flex flex-col items-center">
+                                <div class="relative">
+                                    <a href="#profile" class="inline-block">
+                                        <img id="dashboard-profile-avatar" src="https://placehold.co/100x100/ffffff/3b82f6?text=KV" alt="Karan Vora" class="w-24 h-24 rounded-full border-4 border-white shadow-md cursor-pointer">
+                                    </a>
+                                </div>
+                                <h3 id="dashboard-profile-name" class="text-xl font-bold mt-4">Karan Vora</h3>
+                                <p id="dashboard-profile-details" class="text-sm text-blue-200">COMPS • Semester 5</p>
+                                <div class="mt-4 text-sm bg-blue-700/50 px-3 py-1 rounded-full">
+                                    <span class="font-bold text-yellow-300">★</span> 120 reputation
+                                </div>
+                            </div>
+                            <!-- Quick Actions Card -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <h3 class="text-lg font-bold text-slate-800">Quick Actions</h3>
+                                <div class="mt-4 space-y-2">
+                                    <a href="#" class="block w-full text-left bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors">Upload Notes</a>
+                                    <a href="#qa" class="block w-full text-left bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors">View Your Questions</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="library-content" class="hidden">
+                     <!-- Filters -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            <div class="relative lg:col-span-2">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                </div>
+                                <input type="text" placeholder="Search notes..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <select id="branch-select" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option>All Branches</option>
+                                <option>COMPS</option>
+                                <option>IT</option>
+                                <option>AIDS</option>
+                                <option>EXTC</option>
+                            </select>
+                            <select id="semester-select" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option>All Semesters</option>
+                                <option>Semester 1</option>
+                                <option>Semester 2</option>
+                                <option>Semester 3</option>
+                                <option>Semester 4</option>
+                                <option>Semester 5</option>
+                                <option>Semester 6</option>
+                                <option>Semester 7</option>
+                                <option>Semester 8</option>
+                            </select>
+                            <select id="subject-select" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option>All Subjects</option>
+                                <option>Data Structures</option>
+                                <option>DBMS</option>
+                                <option>DLCOA</option>
+                                <option>DSGT</option>
+                                <option>MATHS</option>
+                            </select>
+                            <select id="type-select" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option>All Types</option>
+                                <option>Notes</option>
+                                <option>PYQ</option>
+                                <option>Short Notes</option>
+                                <option>Assignments</option>
+                                <option>E-Books</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p id="resource-count" class="text-sm text-slate-600 mb-4">Showing 26 of 26 resources</p>
+
+                    <!-- Library Grid -->
+                    <div id="library-grid" class="grid grid-cols-1 md-grid-cols-2 lg-grid-cols-3 gap-6">
+                        <!-- Resource cards will be inserted here by JavaScript -->
+                    </div>
+                    
+                    <!-- No results message (initially hidden) -->
+                    <div id="no-results" class="hidden text-center py-12 bg-white rounded-xl shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto h-12 w-12 text-slate-400"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <h3 class="mt-2 text-lg font-semibold text-slate-800">No Resources Found</h3>
+                        <p class="mt-1 text-sm text-slate-500">
+                            Try adjusting your filters to find what you're looking for.
+                        </p>
+                    </div>
+                </div>
+
+                 <!-- Q&A Page Content -->
+                <div id="qa-content" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <!-- Left Sidebar: Conversations -->
+                            <div class="md:col-span-1">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-sm font-semibold text-slate-700">Conversations</h3>
+                                    <button id="new-conversation" class="bg-blue-600 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg hover:bg-blue-700 transition-colors">New</button>
+                                </div>
+                                <div id="conversation-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+                            </div>
+                            <!-- Chat Area -->
+                            <div class="md:col-span-3 flex flex-col">
+                                <div id="chat-box" class="h-96 overflow-y-auto mb-4 p-4 bg-slate-50 rounded-lg space-y-4"></div>
+                        <div class="flex gap-4">
+                            <input type="text" id="question-input" placeholder="Ask a question..." class="flex-grow w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <button id="send-button" class="flex items-center justify-center bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Quizzes Page Content -->
+                <div id="quizzes-content" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-6">Create a New Quiz</h2>
+                        <div class="space-y-4">
+                             <div>
+                                <label for="quiz-subject" class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
+                                <select id="quiz-subject" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Select Subject</option>
+                                    <option>Data Structures</option>
+                                    <option>DBMS</option>
+                                    <option>DLCOA</option>
+                                    <option>DSGT</option>
+                                    <option>MATHS</option>
+                                </select>
+                            </div>
+                             <div>
+                                <label for="quiz-semester" class="block text-sm font-medium text-slate-700 mb-1">Semester</label>
+                                <select id="quiz-semester" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Select Semester</option>
+                                    <option>Semester 3</option>
+                                </select>
+                            </div>
+                             <div>
+                                <label for="quiz-branch" class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+                                <select id="quiz-branch" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Select Branch</option>
+                                    <option>COMPS</option>
+                                    <option>IT</option>
+                                    <option>AIDS</option>
+                                    <option>EXTC</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Number of Questions</label>
+                                <div class="flex items-center space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="num-questions" value="5" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" checked>
+                                        <span class="ml-2 text-sm text-slate-700">5 Questions</span>
+                                    </label>
+                                </div>
+                            </div>
+                             <div>
+                                <label class="block text-sm font-medium text-slate-700">Time Limit</label>
+                                <p id="time-limit" class="text-lg font-semibold text-slate-800 mt-1">60 Minutes</p>
+                            </div>
+                            <div class="pt-4">
+                                <button id="start-quiz-button" class="w-full flex items-center justify-center bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                                    Start Quiz
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="quiz-active-content" class="hidden">
+                    <!-- Quiz will be rendered here by JavaScript -->
+                </div>
+                
+                 <!-- NEW Profile Page Content -->
+                <div id="profile-content" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-6">Edit Your Profile</h2>
+                        <form id="profile-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="first-name" class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                                    <input type="text" id="first-name" placeholder="Karan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="last-name" class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                                    <input type="text" id="last-name" placeholder="Vora" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="profile-semester" class="block text-sm font-medium text-slate-700 mb-1">Semester</label>
+                                    <select id="profile-semester" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                        <option>Semester 1</option>
+                                        <option>Semester 2</option>
+                                        <option>Semester 3</option>
+                                        <option>Semester 4</option>
+                                        <option selected>Semester 5</option>
+                                        <option>Semester 6</option>
+                                        <option>Semester 7</option>
+                                        <option>Semester 8</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="profile-branch" class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+                                    <select id="profile-branch" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                        <option>COMPS</option>
+                                        <option>IT</option>
+                                        <option>AIDS</option>
+                                        <option>EXTC</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="pt-4">
+                                <button type="submit" class="w-full flex items-center justify-center bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+    <div id="toast-message" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hidden transition-opacity duration-300">
+        Profile saved successfully!
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Auth Guard & User Hydration ---
+            function getCurrentUser() {
+                try { return JSON.parse(localStorage.getItem('currentUser')); } catch (e) { return null; }
+            }
+            function hydrateUserUI() {
+                const user = getCurrentUser();
+                if (!user) return;
+                const firstName = user.firstName || 'Student';
+                const lastName = user.lastName || 'User';
+                const branch = user.branch || 'COMPS';
+                const semester = user.semester || 'Semester 5';
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+
+                const profileName = document.getElementById('profile-name');
+                const profileDetails = document.getElementById('profile-details');
+                const profileAvatar = document.getElementById('profile-avatar');
+                const dashName = document.getElementById('dashboard-profile-name');
+                const dashDetails = document.getElementById('dashboard-profile-details');
+                const dashAvatar = document.getElementById('dashboard-profile-avatar');
+                const welcomeMsg = document.getElementById('welcome-message');
+
+                if (profileName) profileName.textContent = `${firstName} ${lastName}`;
+                if (profileDetails) profileDetails.textContent = `${branch} • ${semester}`;
+                if (profileAvatar) profileAvatar.src = `https://placehold.co/100x100/7c3aed/ffffff?text=${initials}`;
+                if (dashName) dashName.textContent = `${firstName} ${lastName}`;
+                if (dashDetails) dashDetails.textContent = `${branch} • ${semester}`;
+                if (dashAvatar) dashAvatar.src = `https://placehold.co/100x100/ffffff/3b82f6?text=${initials}`;
+                if (welcomeMsg) welcomeMsg.innerHTML = `Welcome back, ${firstName} ${lastName}! 👋`;
+            }
+            const userAtLoad = getCurrentUser();
+            if (!userAtLoad) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Mobile sidebar toggle
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const sidebarClose = document.getElementById('sidebar-close');
+            const mainNav = document.getElementById('main-nav');
+
+            function toggleMenu() {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', toggleMenu);
+            }
+            if (overlay) {
+                overlay.addEventListener('click', toggleMenu);
+            }
+
+            // --- Close sidebar on nav link click on mobile ---
+            if (mainNav) {
+                const navLinks = mainNav.querySelectorAll('a[href^="#"]');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        // If the sidebar is open on a mobile screen, close it
+                        if (window.innerWidth < 1024 && !sidebar.classList.contains('-translate-x-full')) {
+                            toggleMenu();
+                        }
+                    });
+                });
+            }
+
+            // --- Page Navigation Logic ---
+            const contentSections = {
+                dashboard: document.getElementById('dashboard-content'),
+                library: document.getElementById('library-content'),
+                qa: document.getElementById('qa-content'),
+                quizzes: document.getElementById('quizzes-content'),
+                quiz_active: document.getElementById('quiz-active-content'),
+                courses: document.getElementById('courses-content'),
+                profile: document.getElementById('profile-content'),
+            };
+            
+            const mainHeader = document.getElementById('main-header');
+
+            const headerContent = {
+                dashboard: `
+                    <div class="flex items-center">
+                        <button id="menu-toggle-inner" class="lg:hidden -ml-2 mr-2 p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <div>
+                            <h2 id="welcome-message" class="text-2xl sm:text-3xl font-bold text-slate-800">Welcome back, Karan Vora! 👋</h2>
+                            <p class="text-slate-500 mt-1">Ready to learn something new today? Here's your personalized dashboard.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                        <a href="#qa" class="flex items-center justify-center bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            Ask Question
+                        </a>
+                        <a href="#library" class="flex items-center justify-center bg-white text-slate-700 font-semibold px-4 py-2 rounded-lg shadow-md border border-slate-300 hover:bg-slate-50 transition-colors">
+                            Browse Library
+                        </a>
+                    </div>`,
+                library: `
+                    <div class="flex items-center">
+                         <button id="menu-toggle-inner" class="lg:hidden -ml-2 mr-2 p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Resource Library</h2>
+                            <p class="text-slate-500 mt-1">Discover notes, PYQs, and study materials for your semester.</p>
+                        </div>
+                    </div>`,
+                qa: `
+                    <div class="flex items-center">
+                         <button id="menu-toggle-inner" class="lg:hidden -ml-2 mr-2 p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Q&A Assistant</h2>
+                            <p class="text-slate-500 mt-1">Ask questions and get answers from your library notes.</p>
+                        </div>
+                    </div>`,
+                 quizzes: `
+                    <div class="flex items-center">
+                         <button id="menu-toggle-inner" class="lg:hidden -ml-2 mr-2 p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Quizzes</h2>
+                            <p class="text-slate-500 mt-1">Test your knowledge with custom quizzes.</p>
+                        </div>
+                    </div>`,
+                 courses: `
+                    <div class="flex items-center">
+                         <button id="menu-toggle-inner" class="lg:hidden -ml-2 mr-2 p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Courses</h2>
+                            <p class="text-slate-500 mt-1">Browse and enroll in curated programming tracks.</p>
+                        </div>
+                    </div>`,
+                 profile: `
+                    <div class="flex items-center">
+                         <button id="menu-toggle-inner" class="lg:hidden -ml-2 mr-2 p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Your Profile</h2>
+                            <p class="text-slate-500 mt-1">Manage your account settings and personal information.</p>
+                        </div>
+                    </div>`
+            };
+            
+            function handleNavigation() {
+                const hash = window.location.hash || '#dashboard';
+                const view = hash.substring(1);
+
+                // Hide all content sections
+                Object.values(contentSections).forEach(section => {
+                    if (section) section.classList.add('hidden');
+                });
+
+                // Show the active one
+                if (contentSections[view]) {
+                    contentSections[view].classList.remove('hidden');
+                }
+
+                // Update header
+                if (headerContent[view]) {
+                    mainHeader.innerHTML = headerContent[view];
+                     // Re-attach menu toggle event listener for the new button in the header
+                    const newMenuToggle = document.getElementById('menu-toggle-inner');
+                    if(newMenuToggle) {
+                        newMenuToggle.addEventListener('click', toggleMenu);
+                    }
+                    hydrateUserUI();
+                }
+                
+                // Update nav link styles
+                const navLinks = mainNav.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href').startsWith('#')) {
+                        if (link.getAttribute('href') === hash) {
+                            link.classList.add('bg-slate-700', 'text-blue-300');
+                            link.classList.remove('text-slate-300', 'hover:bg-slate-700');
+                        } else {
+                            link.classList.remove('bg-slate-700', 'text-blue-300');
+                            link.classList.add('text-slate-300', 'hover:bg-slate-700');
+                        }
+                    }
+                });
+            }
+
+            // Listen for hash changes (e.g., back/forward buttons)
+            window.addEventListener('hashchange', handleNavigation);
+            
+            // Initial load
+            handleNavigation();
+            hydrateUserUI();
+
+            // --- Library Data and Filtering Logic ---
+            const resources = [
+                {
+                    title: 'DBMS Assignment 1',
+                    subject: 'DBMS',
+                    semester: 'Semester 3',
+                    type: 'Assignments',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 12',
+                    link: './DBMS/DBMS_Assignment_1.pdf'
+                },
+                 {
+                    title: 'DBMS Module 1: Introduction',
+                    subject: 'DBMS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DBMS/DBMS_Module_1.pdf'
+                },
+                {
+                    title: 'DBMS Module 2: Entity-Relationship Model',
+                    subject: 'DBMS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DBMS/DBMS_Module_2.pdf'
+                },
+                {
+                    title: 'DBMS Module 3: Relational Model & Algebra',
+                    subject: 'DBMS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DBMS/DBMS_Module_3.pdf'
+                },
+                {
+                    title: 'DBMS Module 4: Structured Query Language (SQL)',
+                    subject: 'DBMS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    links: [
+                        { label: 'View 1', url: './DBMS/DBMS_Module_4_one.pdf' },
+                        { label: 'View 2', url: './DBMS/DBMS_Module_4_two.pdf' }
+                    ]
+                },
+                {
+                    title: 'DBMS Module 5: Relational-Database Design',
+                    subject: 'DBMS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DBMS/DBMS_Module_5.pdf'
+                },
+                {
+                    title: 'DLCOA Module 1: Computer Fundamentals',
+                    subject: 'DLCOA',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DLCOA/Notes/Module_1.pdf'
+                },
+                 {
+                    title: 'DLCOA Module 2: Data Representation',
+                    subject: 'DLCOA',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DLCOA/Notes/Module_2.pdf'
+                },
+                {
+                    title: 'DLCOA Module 3: Processor Organization & Architecture',
+                    subject: 'DLCOA',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DLCOA/Notes/Module_3.pdf'
+                },
+                {
+                    title: 'Data Structure Module 1: Introduction',
+                    subject: 'Data Structures',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DS/Module_1.pdf'
+                },
+                {
+                    title: 'Data Structure Module 2: Stacks and Queues',
+                    subject: 'Data Structures',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DS/Module_2.pdf'
+                },
+                {
+                    title: 'Data Structure Module 3: Linked Lists',
+                    subject: 'Data Structures',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DS/Module_3.pdf'
+                },
+                {
+                    title: 'Data Structure Module 4: Trees',
+                    subject: 'Data Structures',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DS/Module_4.pdf'
+                },
+                {
+                    title: 'Data Structure Module 5: Graphs',
+                    subject: 'Data Structures',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DS/Module_5.pdf'
+                },
+                {
+                    title: 'Data Structure Module 6: Searching Techniques',
+                    subject: 'Data Structures',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DS/Module_6.pdf'
+                },
+                {
+                    title: 'Maths Module 1: Laplace Transformation',
+                    subject: 'MATHS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './Maths/Module_1.pdf'
+                },
+                {
+                    title: 'Maths Module 2: Inverse Laplace Transform',
+                    subject: 'MATHS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './Maths/Module_2.pdf'
+                },
+                {
+                    title: 'Maths Module 3: Fourier Series & Fourier Transform',
+                    subject: 'MATHS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './Maths/Module_3.pdf'
+                },
+                {
+                    title: 'Maths Module 4: Complex Variables',
+                    subject: 'MATHS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './Maths/Module_4.pdf'
+                },
+                 {
+                    title: 'Maths Module 5: Statistical Techniques',
+                    subject: 'MATHS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './Maths/Module_5.pdf'
+                },
+                {
+                    title: 'Maths Module 6: Probability',
+                    subject: 'MATHS',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './Maths/Module_6.pdf'
+                },
+                {
+                    title: 'DSGT Module 1: Logic and Proofs',
+                    subject: 'DSGT',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DSGT/Module_1.pdf'
+                },
+                {
+                    title: 'DSGT Module 2: Relations & Functions',
+                    subject: 'DSGT',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DSGT/Module_2.pdf'
+                },
+                {
+                    title: 'DSGT Module 3: Posets and Lattice',
+                    subject: 'DSGT',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DSGT/Module_3.pdf'
+                },
+                {
+                    title: 'DSGT Module 4: Counting',
+                    subject: 'DSGT',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DSGT/Module_4.pdf'
+                },
+                 {
+                    title: 'DSGT Module 6: Graph Theory',
+                    subject: 'DSGT',
+                    semester: 'Semester 3',
+                    type: 'Notes',
+                    branch: 'COMPS',
+                    downloads: 0,
+                    date: 'Oct 11',
+                    link: './DSGT/Module_6.pdf'
+                },
+            ];
+
+            const libraryGrid = document.getElementById('library-grid');
+            const resourceCount = document.getElementById('resource-count');
+            const noResultsMessage = document.getElementById('no-results');
+            const dashboardResourceCount = document.getElementById('dashboard-resource-count');
+            const recentResourcesContainer = document.getElementById('recent-resources-container');
+            let recentlyUsed = [];
+
+            function renderResources(filteredResources) {
+                if (!libraryGrid) return;
+                libraryGrid.innerHTML = ''; // Clear existing cards
+                if (filteredResources.length === 0) {
+                    noResultsMessage.classList.remove('hidden');
+                    libraryGrid.classList.add('hidden');
+
+                } else {
+                    noResultsMessage.classList.add('hidden');
+                    libraryGrid.classList.remove('hidden');
+                    filteredResources.forEach(res => {
+                        let buttonsHtml = '';
+                        if (res.links && Array.isArray(res.links)) {
+                            buttonsHtml = res.links.map(link => `
+                                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white font-semibold px-3 py-1.5 text-xs rounded-lg hover:bg-blue-700 transition-colors ml-2">${link.label}</a>
+                            `).join('');
+                        } else if (res.link) {
+                            buttonsHtml = `<a href="${res.link}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white font-semibold px-3 py-1.5 text-xs rounded-lg hover:bg-blue-700 transition-colors">View</a>`;
+                        }
+
+                        const card = `
+                            <div class="bg-white p-5 rounded-xl shadow-sm flex flex-col" data-title="${res.title}">
+                                <h4 class="font-bold text-slate-800 flex-grow">${res.title}</h4>
+                                <div class="flex flex-wrap items-center gap-2 mt-3">
+                                    <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-md">${res.subject}</span>
+                                    <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-md">${res.semester}</span>
+                                    <span class="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded-md">${res.type.toUpperCase()}</span>
+                                    <span class="text-xs font-medium text-purple-700 bg-purple-100 px-2 py-1 rounded-md">${res.branch}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200">
+                                    <span>${res.downloads} downloads • ${res.date}</span>
+                                    <div class="flex">${buttonsHtml}</div>
+                                </div>
+                            </div>
+                        `;
+                        libraryGrid.insertAdjacentHTML('beforeend', card);
+                    });
+                }
+                 resourceCount.textContent = `Showing ${filteredResources.length} of ${resources.length} resources`;
+                 if (dashboardResourceCount) {
+                     dashboardResourceCount.textContent = resources.length;
+                 }
+            }
+            
+            function renderRecentResources() {
+                if (!recentResourcesContainer) return;
+                if (recentlyUsed.length === 0) {
+                    recentResourcesContainer.innerHTML = '<p class="text-slate-500">No resources viewed recently. Go to the library to start exploring!</p>';
+                } else {
+                    recentResourcesContainer.innerHTML = '';
+                    recentlyUsed.forEach(res => {
+                        const item = `
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg hover:bg-slate-50">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-slate-700">${res.title}</h4>
+                                    <div class="flex items-center space-x-2 mt-2">
+                                        <span class="text-xs font-medium text-slate-600 bg-slate-200 px-2 py-1 rounded-md">${res.subject}</span>
+                                        <span class="text-xs font-medium text-slate-600 bg-slate-200 px-2 py-1 rounded-md">${res.semester}</span>
+                                        <span class="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded-md">${res.type.toUpperCase()}</span>
+                                    </div>
+                                </div>
+                                <a href="${res.link || res.links[0].url}" target="_blank" rel="noopener noreferrer" class="mt-4 sm:mt-0 sm:ml-4 bg-white text-slate-700 font-semibold px-4 py-2 text-sm rounded-lg shadow-sm border border-slate-300 hover:bg-slate-100 transition-colors">View</a>
+                            </div>
+                        `;
+                        recentResourcesContainer.insertAdjacentHTML('beforeend', item);
+                    });
+                }
+            }
+            
+            function addRecentResource(resource) {
+                recentlyUsed = recentlyUsed.filter(item => item.title !== resource.title);
+                recentlyUsed.unshift(resource);
+                if (recentlyUsed.length > 2) {
+                    recentlyUsed.pop();
+                }
+                renderRecentResources();
+            }
+            
+            // Event delegation for library view clicks
+            if (libraryGrid) {
+                libraryGrid.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && e.target.textContent.includes('View')) {
+                        const card = e.target.closest('.bg-white');
+                        const title = card.dataset.title;
+                        const resource = resources.find(r => r.title === title);
+                        if (resource) {
+                            addRecentResource(resource);
+                        }
+                    }
+                });
+            }
+
+            // Initial render
+            renderResources(resources);
+            renderRecentResources();
+
+
+            // --- Dynamic Subject Filtering ---
+            const semesterSelect = document.getElementById('semester-select');
+            const subjectSelect = document.getElementById('subject-select');
+
+            const semesterSubjects = {
+                "Semester 3": ["DLCOA", "DSGT", "DBMS", "MATHS", "Data Structures"]
+            };
+
+            function updateSubjectOptions(subjects) {
+                if(!subjectSelect) return;
+                subjectSelect.innerHTML = '<option>All Subjects</option>';
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelect.appendChild(option);
+                });
+            }
+            
+            if (semesterSelect && subjectSelect) {
+                semesterSelect.addEventListener('change', (event) => {
+                    const selectedSemester = event.target.value;
+                    if (semesterSubjects[selectedSemester]) {
+                        updateSubjectOptions(semesterSubjects[selectedSemester]);
+                    } else {
+                        updateSubjectOptions([]);
+                    }
+                     filterResources();
+                });
+            }
+
+            const filters = document.querySelectorAll('#library-content select, #library-content input[type="text"]');
+            filters.forEach(filter => {
+                filter.addEventListener('change', filterResources);
+                if(filter.type === 'text') {
+                    filter.addEventListener('keyup', filterResources);
+                }
+            });
+
+            function filterResources() {
+                 if (!libraryGrid) return;
+                const searchTerm = document.querySelector('#library-content input[type="text"]').value.toLowerCase();
+                const selectedSemester = document.getElementById('semester-select').value;
+                const selectedSubject = document.getElementById('subject-select').value;
+                const selectedType = document.getElementById('type-select').value;
+                const selectedBranch = document.getElementById('branch-select').value;
+                
+                const filtered = resources.filter(res => {
+                    const matchesSearch = res.title.toLowerCase().includes(searchTerm);
+                    const matchesSemester = selectedSemester === 'All Semesters' || res.semester === selectedSemester;
+                    const matchesSubject = selectedSubject === 'All Subjects' || res.subject === selectedSubject;
+                    const matchesType = selectedType === 'All Types' || res.type === selectedType;
+                    const matchesBranch = selectedBranch === 'All Branches' || res.branch === selectedBranch;
+
+                    return matchesSearch && matchesSemester && matchesSubject && matchesType && matchesBranch;
+                });
+                
+                renderResources(filtered);
+            }
+
+            // --- Q&A Logic ---
+            (function qaLogic(){
+                const chatBox = document.getElementById('chat-box');
+                const inputEl = document.getElementById('question-input');
+                const sendBtn = document.getElementById('send-button');
+                const convList = document.getElementById('conversation-list');
+                const newConvBtn = document.getElementById('new-conversation');
+                const API_BASE = 'http://localhost:3000/api/';
+                let apiHealthy = false;
+
+                function getUserId(){
+                    try { return (JSON.parse(localStorage.getItem('currentUser'))||{}).id || 'guest'; } catch(e){ return 'guest'; }
+                }
+                function storageKey(){ return `qa_conversations_${getUserId()}`; }
+                async function checkApi(){
+                    try {
+                        const res = await fetch(API_BASE + '/health', { method: 'GET' });
+                        apiHealthy = res.ok;
+                    } catch (_) { apiHealthy = false; }
+                }
+
+                function loadConversations(){
+                    try { return JSON.parse(localStorage.getItem(storageKey())) || []; } catch(e){ return []; }
+                }
+                function saveConversations(conversations){
+                    localStorage.setItem(storageKey(), JSON.stringify(conversations));
+                }
+                async function fetchConversations(){
+                    if (!apiHealthy) return loadConversations();
+                    try {
+                        const res = await fetch(`${API_BASE}/conversations?userId=${encodeURIComponent(getUserId())}`);
+                        if (!res.ok) throw new Error('bad');
+                        const data = await res.json();
+                        // also cache locally
+                        saveConversations(data);
+                        return data;
+                    } catch (_) {
+                        return loadConversations();
+                    }
+                }
+                async function createConversationRemote(conv){
+                    if (!apiHealthy) return;
+                    try {
+                        await fetch(`${API_BASE}/conversations`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getUserId(), ...conv }) });
+                    } catch(_){}
+                }
+                async function updateConversationRemote(conv){
+                    if (!apiHealthy) return;
+                    try {
+                        await fetch(`${API_BASE}/conversations/${encodeURIComponent(conv.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: getUserId(), ...conv }) });
+                    } catch(_){}
+                }
+                async function deleteConversationRemote(id){
+                    if (!apiHealthy) return;
+                    try {
+                        await fetch(`${API_BASE}/conversations/${encodeURIComponent(id)}?userId=${encodeURIComponent(getUserId())}`, { method: 'DELETE' });
+                    } catch(_){}
+                }
+                function ensureDefaultConversation(){
+                    let conversations = loadConversations();
+                    if(conversations.length === 0){
+                        conversations = [{ id: Date.now().toString(), title: 'Conversation 1', messages: [] }];
+                        saveConversations(conversations);
+                        localStorage.setItem('qa_active_conversation', conversations[0].id);
+                    }
+                    return conversations;
+                }
+                function getActiveConversationId(){
+                    return localStorage.getItem('qa_active_conversation');
+                }
+                function setActiveConversationId(id){
+                    localStorage.setItem('qa_active_conversation', id);
+                }
+                function renderConversationList(){
+                    const conversations = ensureDefaultConversation();
+                    const activeId = getActiveConversationId() || conversations[0].id;
+                    if(!convList) return;
+                    convList.innerHTML = '';
+                    conversations.forEach(c => {
+                        const row = document.createElement('div');
+                        row.className = `flex items-center gap-2 px-2 py-2 rounded-lg border ${c.id===activeId ? 'bg-blue-50 border-blue-300' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = `flex-1 text-left text-sm ${c.id===activeId ? 'text-blue-800' : 'text-slate-700'}`;
+                        btn.textContent = c.title || 'Conversation';
+                        btn.addEventListener('click', ()=>{ setActiveConversationId(c.id); renderConversationList(); renderMessages(); });
+                        const del = document.createElement('button');
+                        del.type = 'button';
+                        del.className = 'text-slate-500 hover:text-red-600 text-xs font-semibold px-2 py-1 rounded';
+                        del.textContent = 'Delete';
+                        del.addEventListener('click', async (e)=>{
+                            e.stopPropagation();
+                            const conversations = loadConversations();
+                            const filtered = conversations.filter(x => x.id !== c.id);
+                            saveConversations(filtered);
+                            await deleteConversationRemote(c.id);
+                            const next = filtered[0];
+                            if (next) setActiveConversationId(next.id); else localStorage.removeItem('qa_active_conversation');
+                            renderConversationList();
+                            renderMessages();
+                        });
+                        row.appendChild(btn);
+                        row.appendChild(del);
+                        convList.appendChild(row);
+                    });
+                }
+                function renderMessages(){
+                    const conversations = ensureDefaultConversation();
+                    const activeId = getActiveConversationId() || conversations[0].id;
+                    const conv = conversations.find(c => c.id === activeId) || conversations[0];
+                    if(!conv) return;
+                    chatBox.innerHTML = '';
+                    if(conv.messages.length === 0){
+                        const welcome = document.createElement('div');
+                        welcome.className = 'flex items-start gap-3';
+                        welcome.innerHTML = `
+                            <div class="bg-blue-600 text-white rounded-full h-8 w-8 flex-shrink-0 flex items-center justify-center font-bold text-sm">CR</div>
+                            <div class="bg-slate-200 p-3 rounded-lg rounded-tl-none">
+                                <p class="text-sm text-slate-800">Hello! I'm your ClassReconnect assistant. Ask me anything about your course material, and I'll do my best to provide a clear, step-by-step answer.</p>
+                            </div>`;
+                        chatBox.appendChild(welcome);
+                    } else {
+                        conv.messages.forEach(m => {
+                            const row = document.createElement('div');
+                            if(m.role === 'user'){
+                                row.className = 'flex items-start gap-3 justify-end';
+                                row.innerHTML = `
+                                    <div class="bg-blue-600 text-white p-3 rounded-lg rounded-tr-none max-w-[80%]"><p class="text-sm">${m.text}</p></div>`;
+                            } else {
+                                row.className = 'flex items-start gap-3';
+                                row.innerHTML = `
+                                    <div class="bg-blue-600 text-white rounded-full h-8 w-8 flex-shrink-0 flex items-center justify-center font-bold text-sm">CR</div>
+                                    <div class="bg-slate-200 p-3 rounded-lg rounded-tl-none max-w-[80%]"><p class="text-sm text-slate-800">${m.text}</p></div>`;
+                            }
+                            chatBox.appendChild(row);
+                        });
+                    }
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+                function appendMessage(role, text){
+                    const conversations = ensureDefaultConversation();
+                    const activeId = getActiveConversationId() || conversations[0].id;
+                    const idx = conversations.findIndex(c => c.id === activeId);
+                    if(idx === -1) return;
+                    const message = { role, text, ts: Date.now() };
+                    conversations[idx].messages.push(message);
+                    // Set title from first user message if default title
+                    if(conversations[idx].messages.length === 1 && role === 'user'){
+                        conversations[idx].title = text.slice(0, 30) || conversations[idx].title;
+                    }
+                    saveConversations(conversations);
+                }
+                async function handleSend(){
+                    const text = (inputEl.value || '').trim();
+                    if(!text) return;
+                    appendMessage('user', text);
+                    inputEl.value = '';
+                    renderConversationList();
+                    renderMessages();
+                    // Call backend ChatGPT with conversation history for follow-ups
+                    const conversations = loadConversations();
+                    const activeId = getActiveConversationId();
+                    const conv = conversations.find(c => c.id === activeId) || conversations[0];
+                    if (apiHealthy && conv) {
+                        try {
+                            const res = await fetch(`${API_BASE}/qa`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conv.messages }) });
+                            if (res.ok) {
+                                const data = await res.json();
+                                appendMessage('assistant', data.answer || '');
+                                renderMessages();
+                                // persist conversation remotely
+                                await updateConversationRemote({ id: conv.id, title: conv.title, messages: (loadConversations().find(c=>c.id===conv.id)||conv).messages });
+                                return;
+                            }
+                        } catch(_){}
+                    }
+                    // Fallback assistant response if backend not available
+                    appendMessage('assistant', 'Thanks! I will analyze your question and craft a clear, step-by-step answer.');
+                    renderMessages();
+                }
+                function startNewConversation(){
+                    const conversations = loadConversations();
+                    const id = Date.now().toString();
+                    const conv = { id, title: `Conversation ${conversations.length + 1}`, messages: [] };
+                    conversations.unshift(conv);
+                    saveConversations(conversations);
+                    createConversationRemote(conv);
+                    setActiveConversationId(id);
+                    renderConversationList();
+                    renderMessages();
+                }
+
+                // Initialize
+                (async function init(){
+                    await checkApi();
+                    const remote = await fetchConversations();
+                    if (remote && remote.length) saveConversations(remote);
+                    ensureDefaultConversation();
+                })();
+                if(!getActiveConversationId()){
+                    const convs = loadConversations();
+                    if(convs[0]) setActiveConversationId(convs[0].id);
+                }
+                renderConversationList();
+                renderMessages();
+
+                // Events
+                sendBtn && sendBtn.addEventListener('click', handleSend);
+                inputEl && inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); handleSend(); }});
+                newConvBtn && newConvBtn.addEventListener('click', startNewConversation);
+            })();
+            
+            // --- Quiz Logic ---
+            (function quizLogic(){
+                const startBtn = document.getElementById('start-quiz-button');
+                const quizActive = document.getElementById('quiz-active-content');
+                const subjectSel = document.getElementById('quiz-subject');
+                const semesterSel = document.getElementById('quiz-semester');
+                const branchSel = document.getElementById('quiz-branch');
+
+                function pickRandom(array, count){
+                    const copy = array.slice();
+                    for(let i=copy.length-1;i>0;i--){
+                        const j = Math.floor(Math.random()*(i+1));
+                        [copy[i],copy[j]] = [copy[j],copy[i]];
+                    }
+                    return copy.slice(0, count);
+                }
+
+                function getNumQuestions(){
+                    const selected = document.querySelector('input[name="num-questions"]:checked');
+                    const n = selected ? parseInt(selected.value, 10) : 5;
+                    return isNaN(n) ? 5 : n;
+                }
+
+                function filterResourcesForQuiz(){
+                    const s = subjectSel ? subjectSel.value : 'Select Subject';
+                    const sem = semesterSel ? semesterSel.value : 'Select Semester';
+                    const br = branchSel ? branchSel.value : 'Select Branch';
+                    return resources.filter(r => {
+                        const mSubject = s === 'Select Subject' || r.subject === s;
+                        const mSem = sem === 'Select Semester' || r.semester === sem;
+                        const mBranch = br === 'Select Branch' || r.branch === br;
+                        return mSubject && mSem && mBranch;
+                    });
+                }
+
+                function buildOptions(correct, primaryPool, fallbackPool){
+                    // Build 3 unique wrong options from union of primary and fallback pools
+                    const set = Array.from(new Set([...(primaryPool||[]), ...(fallbackPool||[])]))
+                        .filter(v => v && v !== correct);
+                    const wrongs = pickRandom(set, Math.min(3, set.length));
+                    while (wrongs.length < 3) {
+                        // pad deterministically from fallback lists if still short
+                        const extra = (fallbackPool||[]).find(v => v && v !== correct && !wrongs.includes(v));
+                        if (extra) wrongs.push(extra); else break;
+                    }
+                    const opts = [correct, ...wrongs.slice(0,3)];
+                    // If still less than 4 due to extremely small pools, duplicate safe placeholders
+                    while (opts.length < 4) {
+                        const candidate = (fallbackPool||[])[opts.length] || `Option ${opts.length+1}`;
+                        if (!opts.includes(candidate) && candidate !== correct) opts.push(candidate); else opts.push(`Choice ${opts.length+1}`);
+                    }
+                    return pickRandom(opts, opts.length); // shuffle
+                }
+
+                function generateQuestionFromResource(res){
+                    const types = [];
+                    if (res.subject) types.push('subject');
+                    if (res.semester) types.push('semester');
+                    if (res.type) types.push('type');
+                    if (res.branch) types.push('branch');
+                    const kind = types[Math.floor(Math.random()*types.length)];
+                    let prompt = '', correct = '', options = [];
+                    const fallbackSubjects = ["DLCOA","DSGT","DBMS","MATHS","Data Structures"]; // cover library subjects
+                    const fallbackSemesters = ["Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7","Semester 8"];
+                    const fallbackTypes = ["Notes","PYQ","Short Notes","Assignments","E-Books"];
+                    const fallbackBranches = ["COMPS","IT","AIDS","EXTC"];
+
+                    if (kind === 'subject'){
+                        prompt = `Which subject does "${res.title}" belong to?`;
+                        correct = res.subject;
+                        const pool = Array.from(new Set(resources.map(r=>r.subject).filter(Boolean)));
+                        options = buildOptions(correct, pool, fallbackSubjects);
+                    } else if (kind === 'semester'){
+                        prompt = `Which semester is "${res.title}" for?`;
+                        correct = res.semester;
+                        const pool = Array.from(new Set(resources.map(r=>r.semester).filter(Boolean)));
+                        options = buildOptions(correct, pool, fallbackSemesters);
+                    } else if (kind === 'type'){
+                        prompt = `What type of resource is "${res.title}"?`;
+                        correct = res.type;
+                        const pool = Array.from(new Set(resources.map(r=>r.type).filter(Boolean)));
+                        options = buildOptions(correct, pool, fallbackTypes);
+                    } else {
+                        prompt = `Which branch is "${res.title}" associated with?`;
+                        correct = res.branch;
+                        const pool = Array.from(new Set(resources.map(r=>r.branch).filter(Boolean)));
+                        options = buildOptions(correct, pool, fallbackBranches);
+                    }
+                    return { prompt, options, answer: correct, ref: res.title };
+                }
+
+                function generateQuiz(){
+                    const pool = filterResourcesForQuiz();
+                    const num = getNumQuestions();
+                    const base = pool.length > 0 ? pool : resources; // fallback to all
+                    const chosen = pickRandom(base, Math.min(num, base.length));
+                    const questions = chosen.map(generateQuestionFromResource);
+                    // If not enough, pad by reusing different question types from more picks
+                    while (questions.length < num){
+                        const extraRes = pickRandom(base, 1)[0];
+                        questions.push(generateQuestionFromResource(extraRes));
+                    }
+                    return questions.slice(0, num);
+                }
+
+                function renderQuiz(questions){
+                    if (!quizActive) return;
+                    // navigate
+                    window.location.hash = '#quiz_active';
+                    // build UI
+                    quizActive.classList.remove('hidden');
+                    const html = [
+                        '<div class="bg-white p-6 rounded-xl shadow-sm">',
+                        '<h2 class="text-2xl font-bold text-slate-800 mb-4">Quiz</h2>',
+                        '<ol class="space-y-6">'
+                    ];
+                    questions.forEach((q, idx)=>{
+                        const qId = `q_${idx}`;
+                        html.push(
+                            `<li>`,
+                            `<p class="font-semibold text-slate-800 mb-2">${idx+1}. ${q.prompt}</p>`,
+                            `<div class="space-y-2">`,
+                            q.options.map((opt, i)=>{
+                                const id = `${qId}_opt_${i}`;
+                                return `<label for="${id}" class="flex items-center gap-2 p-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                    <input id="${id}" type="radio" name="${qId}" value="${opt}" class="h-4 w-4 text-blue-600">
+                                    <span class="text-sm text-slate-800">${opt}</span>
+                                </label>`;
+                            }).join(''),
+                            `</div>`,
+                            `<p class="text-xs text-slate-400 mt-1">Reference: ${q.ref}</p>`,
+                            `</li>`
+                        );
+                    });
+                    html.push('</ol>');
+                    html.push('<div class="mt-6 flex gap-3">');
+                    html.push('<button id="submit-quiz" class="bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors">Submit</button>');
+                    html.push('<button id="cancel-quiz" class="bg-white border border-slate-300 text-slate-700 font-semibold px-5 py-2 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>');
+                    html.push('</div></div>');
+                    quizActive.innerHTML = html.join('');
+
+                    const submitBtn = document.getElementById('submit-quiz');
+                    const cancelBtn = document.getElementById('cancel-quiz');
+                    submitBtn && submitBtn.addEventListener('click', function(){
+                        let score = 0;
+                        const details = [];
+                        questions.forEach((q, idx)=>{
+                            const qId = `q_${idx}`;
+                            const chosen = (document.querySelector(`input[name="${qId}"]:checked`)||{}).value || null;
+                            const correct = q.answer;
+                            if (chosen === correct) score++;
+                            details.push({ prompt: q.prompt, chosen, correct });
+                        });
+                        renderResults(score, questions.length, details);
+                    });
+                    cancelBtn && cancelBtn.addEventListener('click', function(){
+                        window.location.hash = '#quizzes';
+                    });
+                }
+
+                function renderResults(score, total, details){
+                    if (!quizActive) return;
+                    const percent = Math.round((score/total)*100);
+                    const rows = details.map(d=>{
+                        const isCorrect = d.chosen === d.correct;
+                        return `<div class="p-3 rounded-lg border ${isCorrect? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'} mb-2">
+                            <p class="text-sm font-semibold text-slate-800">${d.prompt}</p>
+                            <p class="text-sm ${isCorrect? 'text-green-700' : 'text-red-700'}">Your answer: ${d.chosen ?? '—'}</p>
+                            ${isCorrect? '' : `<p class="text-sm text-slate-700">Correct answer: ${d.correct}</p>`}
+                        </div>`;
+                    }).join('');
+                    quizActive.innerHTML = `
+                        <div class="bg-white p-6 rounded-xl shadow-sm">
+                            <h2 class="text-2xl font-bold text-slate-800 mb-2">Results</h2>
+                            <p class="text-slate-700 mb-4">You scored <span class="font-bold">${score}/${total}</span> (${percent}%).</p>
+                            <div class="mb-4">${rows}</div>
+                            <div class="flex gap-3">
+                                <button id="retry-quiz" class="bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors">Retry with same filters</button>
+                                <button id="back-quizzes" class="bg-white border border-slate-300 text-slate-700 font-semibold px-5 py-2 rounded-lg hover:bg-slate-50 transition-colors">Back to Quizzes</button>
+                            </div>
+                        </div>`;
+                    const retry = document.getElementById('retry-quiz');
+                    const back = document.getElementById('back-quizzes');
+                    retry && retry.addEventListener('click', ()=>{ renderQuiz(generateQuiz()); });
+                    back && back.addEventListener('click', ()=>{ window.location.hash = '#quizzes'; });
+                }
+
+                startBtn && startBtn.addEventListener('click', function(){
+                    const questions = generateQuiz();
+                    renderQuiz(questions);
+                });
+            })();
+            
+            // --- Profile Page Logic ---
+            function showToast(message) {
+                const toast = document.getElementById('toast-message');
+                toast.textContent = message;
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
+            }
+
+            const profileForm = document.getElementById('profile-form');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const firstName = document.getElementById('first-name').value || 'Student';
+                    const lastName = document.getElementById('last-name').value || 'User';
+                    const semester = document.getElementById('profile-semester').value;
+                    const branch = document.getElementById('profile-branch').value;
+
+                    // Update sidebar profile
+                    document.getElementById('profile-name').textContent = `${firstName} ${lastName}`;
+                    document.getElementById('profile-details').textContent = `${branch} • ${semester}`;
+                    
+                    const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                    document.getElementById('profile-avatar').src = `https://placehold.co/100x100/7c3aed/ffffff?text=${initials}`;
+                    
+                    // Update dashboard profile card
+                    document.getElementById('dashboard-profile-name').textContent = `${firstName} ${lastName}`;
+                    document.getElementById('dashboard-profile-details').textContent = `${branch} • ${semester}`;
+                    document.getElementById('dashboard-profile-avatar').src = `https://placehold.co/100x100/ffffff/3b82f6?text=${initials}`;
+                    
+                     const welcomeMsg = document.getElementById('welcome-message');
+                     if(welcomeMsg) {
+                        welcomeMsg.innerHTML = `Welcome back, ${firstName} ${lastName}! 👋`;
+                     }
+                    // Persist back to session
+                    const currentUser = getCurrentUser() || {};
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: currentUser.id || Date.now().toString(),
+                        firstName,
+                        lastName,
+                        email: currentUser.email || '',
+                        branch,
+                        semester
+                    }));
+                    showToast('Profile saved successfully!');
+                });
+            }
+
+            // --- Logout ---
+            const logoutBtn = document.getElementById('logout-button');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                });
+            }
+
+            // Enroll button handling
+            document.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target && target.classList && target.classList.contains('enroll-btn')) {
+                    const course = target.getAttribute('data-course') || 'Course';
+                    showToast(`Enrolled in ${course}!`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

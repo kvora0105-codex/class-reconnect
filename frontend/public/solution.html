@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Solutions</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+  <div class="max-w-3xl mx-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-slate-800">Quiz Solutions</h1>
+      <a href="index.html#student-quizzes" class="text-sm bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium px-3 py-1 rounded">Back</a>
+    </div>
+
+    <div id="solution-container" class="space-y-4"></div>
+  </div>
+
+  <script>
+    function getParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function getCurrentUser() {
+      try {
+        const currentUser = localStorage.getItem('currentUser');
+        return currentUser ? JSON.parse(currentUser) : null;
+      } catch { return null; }
+    }
+
+    function getQuizResults(userId = null) {
+      try {
+        const quizResults = JSON.parse(localStorage.getItem('quizResults')) || [];
+        if (userId) return quizResults.filter(r => r.userId === userId);
+        return quizResults;
+      } catch { return []; }
+    }
+
+    function loadSolutions() {
+      const container = document.getElementById('solution-container');
+      const currentUser = getCurrentUser();
+      const resultIdParam = getParam('resultId');
+
+      const allResults = getQuizResults(currentUser?.id);
+      if (!allResults || allResults.length === 0) {
+        container.innerHTML = `
+          <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded">
+            No quiz results found. Please take a quiz first.
+          </div>
+        `;
+        return;
+      }
+
+      const result = resultIdParam
+        ? allResults.find(r => String(r.id) === String(resultIdParam))
+        : allResults.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))[0];
+
+      if (!result) {
+        container.innerHTML = `
+          <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded">
+            Result not found.
+          </div>
+        `;
+        return;
+      }
+
+      const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+      const quiz = quizzes.find(q => q.id === result.quizId);
+      const quizName = quiz?.name || `Quiz ${result.quizId}`;
+
+      const headerHtml = `
+        <div class="bg-white p-4 rounded-lg border border-slate-200">
+          <div class="flex justify-between items-start">
+            <div>
+              <h2 class="text-xl font-semibold text-slate-800">${quizName}</h2>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-sm font-medium ${result.percentage >= 70 ? 'text-green-700 bg-green-100' : result.percentage >= 50 ? 'text-yellow-700 bg-yellow-100' : 'text-red-700 bg-red-100'} px-2 py-1 rounded">
+                  ${result.percentage}%
+                </span>
+                <span class="text-sm text-slate-600">${result.marks}/${result.totalMarks} marks</span>
+                <span class="text-xs text-slate-500">(${result.score}/${result.totalQuestions} correct)</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">Completed: ${new Date(result.completedAt).toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const questionsHtml = result.answers.map((answer, index) => {
+        let correctText = answer.correctAnswer;
+        let userText = (typeof answer.userAnswer !== 'undefined' && answer.userAnswer !== null) ? answer.userAnswer : null;
+
+        if (quiz && quiz.questions && quiz.questions[answer.questionIndex]) {
+          const q = quiz.questions[answer.questionIndex];
+          const correctIdx = parseInt(answer.correctAnswer, 10);
+          const userIdx = userText !== null ? parseInt(answer.userAnswer, 10) : null;
+
+          if (Array.isArray(q.options)) {
+            if (!Number.isNaN(correctIdx) && q.options[correctIdx] !== undefined) {
+              const letter = String.fromCharCode(65 + correctIdx);
+              correctText = `${letter}. ${q.options[correctIdx]}`;
+            }
+            if (userIdx !== null && !Number.isNaN(userIdx) && q.options[userIdx] !== undefined) {
+              const letterU = String.fromCharCode(65 + userIdx);
+              userText = `${letterU}. ${q.options[userIdx]}`;
+            } else if (userText === null) {
+              userText = 'Not answered';
+            }
+          }
+        } else {
+          const cIdx = parseInt(answer.correctAnswer, 10);
+          if (!Number.isNaN(cIdx)) {
+            correctText = `Option ${String.fromCharCode(65 + cIdx)} (index ${cIdx})`;
+          }
+          if (userText !== null) {
+            const uIdx = parseInt(answer.userAnswer, 10);
+            if (!Number.isNaN(uIdx)) {
+              userText = `Option ${String.fromCharCode(65 + uIdx)} (index ${uIdx})`;
+            }
+          } else {
+            userText = 'Not answered';
+          }
+        }
+
+        const marksPerQuestion = (typeof result.marksPerQuestion === 'number' && result.marksPerQuestion > 0) ? result.marksPerQuestion : 4;
+        const questionMarks = answer.isCorrect ? marksPerQuestion : 0;
+
+        const stepsHtml = (quiz && quiz.questions && quiz.questions[answer.questionIndex] && Array.isArray(quiz.questions[answer.questionIndex].solutionSteps))
+          ? `
+              <div class="mt-2">
+                <div class="text-xs font-semibold text-slate-700 mb-1">Solution Steps</div>
+                <ol class="list-decimal ml-6 text-xs text-slate-700 space-y-1">
+                  ${quiz.questions[answer.questionIndex].solutionSteps.map(s => `<li>${s}</li>`).join('')}
+                </ol>
+              </div>
+            `
+          : '';
+
+        return `
+          <div class="bg-white p-4 rounded-lg border border-slate-200">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-medium">Q${index + 1}:</span>
+              <span class="text-xs px-2 py-1 rounded ${answer.isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${answer.isCorrect ? 'Correct' : 'Incorrect'}</span>
+              <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-700">Marks: ${questionMarks}/${marksPerQuestion}</span>
+            </div>
+            <p class="text-sm text-slate-700 mb-1">${answer.question}</p>
+            <div class="text-xs text-slate-700">
+              <div>Correct: ${correctText}</div>
+              ${typeof answer.userAnswer !== 'undefined' ? `<div>Your answer: ${userText}</div>` : ''}
+            </div>
+            ${stepsHtml}
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = headerHtml + questionsHtml;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSolutions);
+  </script>
+</body>
+</html>

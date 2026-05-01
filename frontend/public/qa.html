@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant - Q&A | ClassReconnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for chat */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Typing animation */
+        .typing-indicator span {
+            animation: bounce 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        /* Message animation */
+        .message-enter {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <span class="text-2xl font-bold text-slate-800">ClassReconnect</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html#dashboard" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+                        Back to Dashboard
+                    </a>
+                    <button id="logout-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white/20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"></path>
+                                <path d="M14 13h2"></path>
+                                <path d="M14 17h2"></path>
+                                <path d="M8 13h2"></path>
+                                <path d="M8 17h2"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 id="assistant-title" class="text-2xl font-bold text-white">AI Assistant</h1>
+                            <p class="text-blue-100 text-sm">Ask me anything - I'm here to help!</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span id="conversation-label" class="text-white/90 text-sm"></span>
+                        <button id="new-conversation-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium">New Conversation</button>
+                        <button id="delete-conversation-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium">Delete</button>
+                        <button id="clear-chat-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors font-medium">Clear Chat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div id="chat-container" class="chat-container h-[600px] overflow-y-auto p-6 space-y-4 bg-slate-50">
+                <!-- Welcome Message -->
+                <div class="message-enter flex items-start space-x-3">
+                    <div class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-white rounded-2xl rounded-tl-none shadow-md p-4 max-w-3xl">
+                            <p class="text-slate-800 leading-relaxed">👋 Hello! I'm your AI assistant. I can help you with:</p>
+                            <ul class="mt-3 space-y-2 text-slate-700">
+                                <li class="flex items-start">
+                                    <span class="text-blue-600 mr-2">•</span>
+                                    <span>Computer Science concepts and programming questions</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-600 mr-2">•</span>
+                                    <span>Explaining algorithms and data structures</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-600 mr-2">•</span>
+                                    <span>Homework help and assignment clarifications</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-600 mr-2">•</span>
+                                    <span>General academic questions</span>
+                                </li>
+                            </ul>
+                            <p class="text-slate-600 text-sm mt-3">Ask me anything to get started!</p>
+                        </div>
+                        <span class="text-xs text-slate-500 mt-1 block ml-1">AI Assistant • Just now</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-slate-200 bg-white p-6">
+                <form id="question-form" class="flex items-end space-x-4">
+                    <div class="flex-1">
+                        <label for="question-input" class="block text-sm font-medium text-slate-700 mb-2">Your Question</label>
+                        <textarea 
+                            id="question-input" 
+                            rows="2" 
+                            placeholder="Type your question here... (e.g., Explain bubble sort algorithm)"
+                            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"
+                            required
+                        ></textarea>
+                    </div>
+                    <button 
+                        type="submit" 
+                        id="submit-btn"
+                        class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    >
+                        <span>Send</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+                <p class="text-xs text-slate-500 mt-3">💡 Tip: Be specific with your questions for better answers!</p>
+            </div>
+        </div>
+
+        <!-- Suggested Questions -->
+        <div class="mt-8">
+            <h2 class="text-lg font-semibold text-slate-800 mb-4">Suggested Questions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button class="suggested-question bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg p-4 text-left transition-all shadow-sm hover:shadow-md">
+                    <p class="font-medium text-slate-800">What is the difference between SQL and NoSQL?</p>
+                </button>
+                <button class="suggested-question bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg p-4 text-left transition-all shadow-sm hover:shadow-md">
+                    <p class="font-medium text-slate-800">Explain the concept of Big O notation</p>
+                </button>
+                <button class="suggested-question bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg p-4 text-left transition-all shadow-sm hover:shadow-md">
+                    <p class="font-medium text-slate-800">How does a binary search tree work?</p>
+                </button>
+                <button class="suggested-question bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg p-4 text-left transition-all shadow-sm hover:shadow-md">
+                    <p class="font-medium text-slate-800">What are the ACID properties in databases?</p>
+                </button>
+                <button class="suggested-question bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg p-4 text-left transition-all shadow-sm hover:shadow-md">
+                    <p class="font-medium text-slate-800">Explain object-oriented programming principles</p>
+                </button>
+                <button class="suggested-question bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg p-4 text-left transition-all shadow-sm hover:shadow-md">
+                    <p class="font-medium text-slate-800">What is the difference between stack and queue?</p>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 pb-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-slate-600 text-sm">
+                ClassReconnect AI Assistant
+            </p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { getCurrentUser, logoutAndRedirect, apiRequest } from './assets/js/api.js';
+
+        const chatContainer = document.getElementById('chat-container');
+        const questionForm = document.getElementById('question-form');
+        const questionInput = document.getElementById('question-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const clearChatBtn = document.getElementById('clear-chat-btn');
+        const newConversationBtn = document.getElementById('new-conversation-btn');
+        const deleteConversationBtn = document.getElementById('delete-conversation-btn');
+        const conversationLabel = document.getElementById('conversation-label');
+        const logoutBtn = document.getElementById('logout-btn');
+        const suggestedQuestions = document.querySelectorAll('.suggested-question');
+        const assistantTitleEl = document.getElementById('assistant-title');
+        const currentUserObj = getCurrentUser();
+        const userRole = (currentUserObj && currentUserObj.role === 'teacher') ? 'teacher' : 'student';
+        if (assistantTitleEl) assistantTitleEl.textContent = 'AI Assistant (' + (userRole === 'teacher' ? 'Teacher' : 'Student') + ')';
+        if (userRole === 'teacher') {
+            const labels = [
+                'Create grading rubric for coding assignment',
+                'Explain Bloom\'s taxonomy with CS examples',
+                'How to teach recursion effectively?',
+                'Design quiz on data structures',
+                'Best practices for code reviews in class',
+                'How to evaluate algorithmic complexity in assignments?'
+            ];
+            suggestedQuestions.forEach((btn, i) => {
+                const p = btn.querySelector('p');
+                if (p && labels[i]) p.textContent = labels[i];
+            });
+        }
+
+        function normalizeQuestion(text) {
+            return text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        }
+
+        const predefinedQA = {
+            [normalizeQuestion('What are the ACID properties in databases?')]:
+                'ACID ensures reliable transactions in relational databases:\n\n' +
+                'Atomicity: a transaction executes entirely or not at all. If any part fails, the database rolls back to the state before the transaction. Example: transferring money from account A to B should debit A and credit B together, not just one side.\n\n' +
+                'Consistency: every committed transaction leaves the database in a valid state that adheres to all constraints, triggers, and invariants. Violations (e.g., negative balances where forbidden) are prevented.\n\n' +
+                'Isolation: concurrent transactions behave as if executed serially. Isolation levels (read committed, repeatable read, serializable) balance concurrency with the risk of anomalies like dirty reads or phantom reads.\n\n' +
+                'Durability: once a transaction commits, its effects persist even after crashes. Engines use write-ahead logs, fsyncs, and often replication to guarantee persistence.',
+            [normalizeQuestion('Explain object-oriented programming principles')]:
+                'Core OOP principles:\n\n' +
+                'Encapsulation: keep data and methods together and control access via class interfaces (private/protected/public). This reduces coupling and protects invariants.\n\n' +
+                'Abstraction: model complex systems with simplified interfaces, hiding implementation details. Focus on “what” not “how”, enabling easier reasoning and substitution.\n\n' +
+                'Inheritance: create specialized types from existing ones (is-a relationship) to reuse behavior. Use carefully to avoid tight coupling (fragile base class); prefer composition when inheritance does not reflect a strict is-a.\n\n' +
+                'Polymorphism: same interface, different implementations (method overriding/virtual dispatch). Enables writing code against abstractions and swapping implementations without changing callers.',
+            [normalizeQuestion('What is the difference between stack and queue?')]:
+                'Stack vs Queue:\n\n' +
+                'Stack: Last-In-First-Out (LIFO). Operations: push (add), pop (remove), peek (top). Typical uses include call stacks, backtracking, and undo/redo. Array or linked-list implementations provide O(1) push/pop.\n\n' +
+                'Queue: First-In-First-Out (FIFO). Operations: enqueue (rear), dequeue (front), front/peek. Used for task scheduling, breadth-first search, buffering. Array-circular buffer or linked-list implementations provide O(1) enqueue/dequeue.',
+            [normalizeQuestion('What is the difference between SQL and NoSQL?')]:
+                'SQL vs NoSQL:\n\n' +
+                'SQL (relational): structured schemas, strong consistency with ACID transactions, powerful joins and constraints. Great for complex queries and relationships. Typical systems: PostgreSQL, MySQL, SQL Server. Scaling often vertical or via sharding/replication.\n\n' +
+                'NoSQL (non-relational): flexible schemas (document, key-value, wide-column, graph), designed for horizontal scaling and high throughput. Consistency may be eventual to maximize availability/partition tolerance. Typical systems: MongoDB (document), Cassandra (wide-column), Redis (key-value), Neo4j (graph).\n\n' +
+                'Choose based on data model, query patterns, consistency needs, and scaling requirements.',
+            [normalizeQuestion('Explain the concept of Big O notation')]:
+                'Big O notation describes the upper bound of time/space growth with input size n, focusing on asymptotic behavior and ignoring constant factors.\n\n' +
+                'Common classes: O(1) constant, O(log n) logarithmic (binary search), O(n) linear (single pass), O(n log n) (efficient sorts like merge/quick on average), O(n^2) quadratic (nested loops), O(2^n)/O(n!) exponential/factorial (brute force on combinatorial problems).\n\n' +
+                'It helps compare scalability. Example: for n=1,000,000, O(n log n) sorting is far faster than O(n^2). Always consider average vs worst case and memory usage alongside runtime.',
+            [normalizeQuestion('How does a binary search tree work?')]:
+                'Binary Search Tree (BST): for every node, values in the left subtree are less and values in the right subtree are greater than the node.\n\n' +
+                'Operations: search, insert, delete typically follow comparisons down the tree, average O(log n) in balanced trees but O(n) in the worst case when the tree degenerates.\n\n' +
+                'Balancing: self-balancing variants (AVL, Red-Black) maintain height ~O(log n) to guarantee performance. Traversals: in-order yields sorted order; pre-order/post-order useful for serialization and subtree processing.'
+            ,
+            [normalizeQuestion('Explain merge sort with complexity')]:
+                'Merge sort is a divide-and-conquer algorithm: split the array, sort halves recursively, then merge.\n\n' +
+                'Time complexity: O(n log n) across best/average/worst. Space complexity: O(n) due to auxiliary arrays.\n\n' +
+                'Stable: yes. Good for linked lists and data where stable sorting matters; less optimal for in-place constraints.',
+            [normalizeQuestion('Explain quick sort with complexity')]:
+                'Quicksort partitions the array around a pivot, then recursively sorts subarrays.\n\n' +
+                'Average/Best time: O(n log n). Worst case: O(n^2) if poor pivots (e.g., already sorted with naive pivot). Space: O(log n) average stack due to recursion.\n\n' +
+                'Typically fastest in practice with good pivot selection (median-of-three, randomized). Not stable by default.',
+            [normalizeQuestion('BFS vs DFS differences and use cases')]:
+                'BFS explores level by level using a queue; DFS goes deep first using a stack/recursion.\n\n' +
+                'BFS use cases: shortest path in unweighted graphs, level-order traversal. DFS use cases: cycle detection, topological sort, path existence, connected components.\n\n' +
+                'Complexity: O(V+E) for both on adjacency structures.',
+            [normalizeQuestion('What are database indexes and their types?')]:
+                'Indexes accelerate lookups by maintaining ordered structures.\n\n' +
+                'Types: B-Tree (default for range queries), Hash (exact match), Bitmap (low-cardinality), Full-text (text search), GiST/SP-GiST (custom structures in PostgreSQL).\n\n' +
+                'Trade-offs: faster reads, slower writes; extra storage; careful selection based on query patterns.',
+            [normalizeQuestion('Explain normalization and normal forms')]:
+                'Normalization reduces redundancy and anomalies.\n\n' +
+                '1NF: atomic values, no repeating groups. 2NF: no partial dependency on a composite key. 3NF: no transitive dependencies; non-key attributes depend only on the key. BCNF: stronger form where every determinant is a candidate key.',
+            [normalizeQuestion('REST vs GraphQL differences')]:
+                'REST exposes multiple endpoints with fixed shapes; GraphQL exposes a single endpoint with a typed schema allowing clients to query exactly what they need.\n\n' +
+                'REST pros: caching simplicity, mature tooling, simplicity. GraphQL pros: reduced over/under-fetching, strong typing, introspection.\n\n' +
+                'Trade-offs: GraphQL requires schema and resolvers; caching is more involved; REST can be simpler for basic CRUD.',
+            [normalizeQuestion('Explain the CAP theorem')]:
+                'CAP: in a distributed system under partition, you must choose between Consistency and Availability.\n\n' +
+                'Consistency: all nodes see the same data at the same time. Availability: every request receives a response (success/failure). Partition tolerance: system continues despite network splits.\n\n' +
+                'Systems pick trade-offs (CP vs AP) based on business needs.',
+            [normalizeQuestion('Deadlock conditions and prevention')]:
+                'Deadlock occurs when processes wait on each other indefinitely.\n\n' +
+                'Necessary conditions: mutual exclusion, hold and wait, no preemption, circular wait.\n\n' +
+                'Prevention: break one condition (e.g., impose resource ordering to avoid circular wait), or use detection and recovery.',
+            [normalizeQuestion('Stack vs heap memory in C')]:
+                'Stack: automatic storage, LIFO allocation, fast, size-limited; variables die when scope ends.\n\n' +
+                'Heap: dynamic allocation via malloc/free, flexible size, slower, fragmentation risk; must manage lifetime explicitly to avoid leaks/dangling pointers.',
+            [normalizeQuestion('Explain SQL joins')]:
+                'Inner join: matching rows only. Left/Right join: include all rows from one side and matching from the other, filling nulls when no match. Full join: include all rows from both sides. Cross join: Cartesian product.\n\n' +
+                'Use join conditions wisely (ON vs WHERE) to avoid accidental cross-products.'
+        };
+
+        function getPredefinedAnswer(question) {
+            const key = normalizeQuestion(question);
+            if (predefinedQA[key]) return predefinedQA[key];
+            if (dynamicQABriefs && dynamicQABriefs.has(key)) return dynamicQABriefs.get(key);
+            const related = generateBriefAnswer(question);
+            if (related) return related;
+            return null;
+        }
+
+        let dynamicQuestionsSet = null;
+        let dynamicQABriefs = null;
+        async function loadPredefinedQuestions() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const res = await fetch('/api/predefined/questions', {
+                    headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (Array.isArray(data.questions)) {
+                    dynamicQuestionsSet = new Set(data.questions.map(normalizeQuestion));
+                    dynamicQABriefs = new Map();
+                    for (const q of data.questions) {
+                        const norm = normalizeQuestion(q);
+                        dynamicQABriefs.set(norm, generateBriefAnswer(q));
+                    }
+                }
+            } catch (_) {}
+        }
+
+        function generateBriefAnswer(q) {
+            const s = normalizeQuestion(q);
+            function has(...terms){ return terms.every(t => s.includes(normalizeQuestion(t))); }
+            function any(...terms){ return terms.some(t => s.includes(normalizeQuestion(t))); }
+
+            if (any('stack', 'queue') && any('abstract data type')) {
+                return 'An Abstract Data Type defines operations and rules independent of implementation. A stack is LIFO with push, pop, and peek operations. A queue is FIFO with enqueue, dequeue, and front operations. Typical implementations use arrays, linked lists, or circular buffers with O(1) operations. These ADTs power undo/redo, call stacks, buffering, scheduling, and BFS.';
+            }
+            if (any('stack overflow') || any('underflow')) {
+                return 'Stack overflow happens when pushes exceed capacity or recursion grows beyond available stack. Stack underflow happens when popping from an empty stack. Both are violations of operation preconditions. Prevent with capacity checks and iterative conversions for deep recursion. Also handle errors gracefully to avoid crashes or corruption.';
+            }
+            if (has('circular queue')) {
+                return 'A circular queue wraps front and rear with modulo arithmetic to reuse freed slots. It eliminates false overflow that occurs in linear arrays after deletions. Empty/full can be tracked with a count or a reserved slot policy. Enqueue and dequeue run in O(1) for fixed-size buffers. It is ideal for producer–consumer buffering and device I/O.';
+            }
+            if (any('priority queue')) {
+                return 'A priority queue serves elements by priority rather than arrival order. Binary heaps give O(log n) insert and extract-min/max. Alternatives include pairing heaps, binomial heaps, and balanced trees. Choose structure based on decrease-key and meld needs. Use in Dijkstra’s shortest path, schedulers, job queues, and simulations.';
+            }
+            if (any('linked list') && any('singly')) {
+                return 'A singly linked list has nodes with data and a next pointer. Insert/delete at the head are O(1) while tail operations are O(n) unless a tail pointer exists. Searching is O(n) due to sequential traversal. It grows flexibly without reallocation. Trade-offs include extra pointer memory and no random access.';
+            }
+            if (any('linked list') && any('doubly')) {
+                return 'A doubly linked list adds a prev pointer for bidirectional traversal. Deletion and splicing are O(1) with a node reference. It increases memory and requires careful pointer maintenance. Deques and LRU caches are common uses. Sentinel nodes simplify edge handling at ends.';
+            }
+            if (any('recursion') && any('stack')) {
+                return 'Recursion decomposes a task into smaller subproblems and uses the call stack for frames. Always include solid base cases and progress toward them. Deep recursion risks stack overflow and may need iterative conversion. Tail calls can be optimized in some languages. An explicit stack often turns recursion into safe iteration.';
+            }
+            if (any('binary search tree')) {
+                return 'A Binary Search Tree stores keys so left < node < right recursively. Average search, insert, and delete are O(log n) when height is small. Worst case degrades to O(n) if the tree becomes skewed. In-order traversal returns keys in sorted order. Balanced variants maintain height and predictability.';
+            }
+            if (any('avl tree')) {
+                return 'An AVL tree is a self-balancing BST enforcing |balance factor| ≤ 1. It performs rotations (LL, RR, LR, RL) after updates to restore height. Operations remain O(log n) with strong worst-case guarantees. Rebalancing cost is small but consistent. Use it where predictable performance is required.';
+            }
+            if (any('expression tree')) {
+                return 'An expression tree models arithmetic with operator nodes and operand leaves. Build from postfix using a stack to assemble nodes. Infix requires precedence handling via shunting-yard before construction. Evaluate recursively by computing child values and applying the operator. Trees enable optimization and easy serialization.';
+            }
+            if (any('traversal') && any('inorder') || any('preorder') || any('post order')) {
+                return 'Inorder visits left, node, right and produces sorted order in BSTs. Preorder visits node first and is useful for serialization and cloning. Postorder visits children before node and supports deletions and bottom-up evaluation. Each traversal has iterative variants using stacks. Choose based on the task and required output order.';
+            }
+            if (any('huffman')) {
+                return 'Huffman coding constructs optimal prefix-free codes from symbol frequencies. It repeatedly merges the two least frequent items using a min-heap. The algorithm runs in O(n log n) for n symbols. Decoding walks the tree deterministically per bit. It is central to practical lossless compression.';
+            }
+            if (any('b tree')) {
+                return 'A B-Tree is a balanced multiway search tree optimized for disks. Nodes hold multiple keys and children to keep height small. Search, insert, and delete are O(log n) in the number of keys. Splits and merges maintain invariants under updates. It is widely used for database and filesystem indexes.';
+            }
+            if (any('graph traversal')) {
+                return 'Graph traversal explores vertices and edges systematically. BFS uses a queue, visits levels, and finds shortest paths in unweighted graphs. DFS uses a stack or recursion to explore deeply and discover components and cycles. Both run in O(V+E) on adjacency structures. Choose based on path requirements and exploration pattern.';
+            }
+            if (any('graph represented')) {
+                return 'Adjacency lists store neighbors per vertex with space O(V+E). Adjacency matrices use O(V^2) space and give O(1) edge checks. Lists favor sparse graphs and fast neighbor iteration. Matrices favor dense graphs and algorithms needing quick adjacency tests. Pick based on density and operation costs.';
+            }
+            if (any('hash') && any('linear probing')) {
+                return 'Linear probing handles collisions by scanning consecutive slots from a hash position. It is simple and cache-friendly due to contiguous memory. Primary clustering can degrade performance as runs grow. Deletion needs tombstones to preserve probe chains. Keep load factor around 0.7 or lower to maintain speed.';
+            }
+            if (any('quadratic probing')) {
+                return 'Quadratic probing tries offsets that grow quadratically from the initial slot. It reduces primary clustering compared to linear probing. Proper table sizes and load factors are crucial to ensure reachability and performance. Secondary clustering can still occur when hashes match. Double hashing further improves distribution when needed.';
+            }
+            if (has('linear search')) {
+                return 'Linear search scans items sequentially until a match is found. It runs in O(n) time and O(1) space. It works on unsorted data and is trivial to implement. It is inefficient for large datasets compared to indexed or sorted structures. Prefer hashing or binary search when applicable.';
+            }
+            if (has('binary search')) {
+                return 'Binary search halves the search space on sorted data by comparing the midpoint. It runs in O(log n) time with O(1) space. Guard against integer overflow when computing mid. Works best on random-access arrays or balanced trees. It fails on unsorted data or cyclic structures.';
+            }
+            if (any('collision') && any('hash')) {
+                return 'Hash collisions require strategies to store multiple keys per hash value. Chaining uses lists per bucket and handles high load well. Open addressing keeps entries in the table and probes alternate slots. Each approach trades memory, cache behavior, and sensitivity to load factor. Choose based on performance targets and deletion patterns.';
+            }
+            if (any('dbms') || any('database') || any('er diagram') || any('normalization')) {
+                return 'A DBMS stores and manages structured data with correctness and performance guarantees. ER modeling captures entities, relationships, and constraints. Normalization (1NF through BCNF) reduces redundancy and update anomalies. Indexes like B+Trees and Hash tables accelerate queries. Transactions with ACID ensure reliable multi-user updates.';
+            }
+            if (any('acid') || any('transaction')) {
+                return 'ACID stands for Atomicity, Consistency, Isolation, and Durability. Atomicity makes transactions all-or-nothing. Consistency preserves database constraints after commits. Isolation makes concurrent work behave like serial execution at chosen levels. Durability ensures committed changes survive crashes.';
+            }
+            if (any('deadlock') && any('transaction')) {
+                return 'A deadlock is a cycle of transactions waiting on each other for resources. The four conditions include mutual exclusion, hold-and-wait, no preemption, and circular wait. Prevent by ordering resources or avoiding hold-and-wait patterns. Detect using wait-for graphs and cycle checks. Recover by aborting one transaction and releasing its locks.';
+            }
+            if (any('ieee 754') || any('floating point')) {
+                return 'IEEE 754 encodes numbers using sign, biased exponent, and significand fields. Single precision uses 1-8-23 bits; double uses 1-11-52 bits. Special values include NaN, infinities, and subnormals with defined behaviors. Rounding modes like nearest-even control results. Numerical error accumulates, so guard sensitive computations.';
+            }
+            if (any('booth')) {
+                return 'Booth’s algorithm multiplies signed binaries by recoding bit patterns. It compresses runs of ones into fewer add/subtract operations. Two’s complement representation is handled naturally in the process. Hardware and software implementations benefit on patterned inputs. Worst-case performance matches classic shift-and-add.';
+            }
+            if (any('bcd')) {
+                return 'Binary-Coded Decimal stores each decimal digit in its own 4-bit nibble. It simplifies exact decimal arithmetic by avoiding binary rounding artifacts. Adders perform decimal correction (add 6) when a nibble exceeds nine. BCD costs more bits than pure binary representation. Finance and embedded systems use it for precision and simplicity.';
+            }
+            if (any('nand') || any('nor')) {
+                return 'NAND and NOR are universal logic gates. Any Boolean function can be synthesized using only NAND or only NOR. Basic gates like NOT, AND, and OR are built by small compositions. De Morgan’s laws guide transformations between forms. This property underpins flexible digital circuit design.';
+            }
+            if (any('adder') && any('full') || any('half')) {
+                return 'A half adder outputs sum and carry for two input bits. A full adder also consumes a carry-in and produces a carry-out. Ripple-carry adders chain full adders but suffer from long carry delays. Carry-lookahead and carry-select adders reduce propagation time. Choose design based on speed, area, and power constraints.';
+            }
+            if (any('multiplexer')) {
+                return 'A multiplexer selects one of many inputs based on control signals. It routes the chosen input to a single output line. MUXes implement conditional data paths and logic functions. Larger MUXes are composed from smaller ones hierarchically. They are pervasive in CPUs, FPGAs, and digital systems.';
+            }
+            if (any('memory hierarchy') || any('cache')) {
+                return 'Memory hierarchy exploits temporal and spatial locality to bridge CPU speed gaps. Levels include registers, cache tiers, DRAM, and persistent storage. Write-through and write-back control when data reaches lower levels. Coherence protocols like MESI synchronize caches across cores. Performance hinges on hit rates and latency balance.';
+            }
+            if (any('pipeline') || any('hazard')) {
+                return 'Pipelining overlaps instruction stages to raise throughput. Data hazards are mitigated with forwarding and stalls. Control hazards are addressed with accurate branch prediction. Structural hazards are fixed by resource duplication or scheduling. Overall speed depends on minimizing bubbles in the pipeline.';
+            }
+            if (any('control unit') || any('microprogrammed') || any('hardwired')) {
+                return 'The control unit orchestrates instruction execution by generating control signals. Hardwired control encodes logic directly for speed. Microprogrammed control uses stored microinstructions for flexibility. The trade-off is speed versus extensibility and design effort. Complex ISAs often benefit from microprogramming.';
+            }
+            return null;
+        }
+
+        loadPredefinedQuestions();
+
+        // Check authentication
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+            window.location.href = 'student-login.html';
+        }
+
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            logoutAndRedirect();
+        });
+
+        function addUserMessage(message) {
+            renderUserMessage(message);
+            const c = getCurrentConversation();
+            if (c) {
+                c.messages.push({ role: 'user', content: message });
+                saveConversations();
+            }
+            saveMessageToServer(message, true);
+        }
+
+        function addAIMessage(message) {
+            renderAIMessage(message);
+            const c = getCurrentConversation();
+            if (c) {
+                c.messages.push({ role: 'ai', content: message });
+                saveConversations();
+            }
+            saveMessageToServer(message, false);
+        }
+
+        // Add typing indicator
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'message-enter flex items-start space-x-3';
+            typingDiv.innerHTML = `
+                <div class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="bg-white rounded-2xl rounded-tl-none shadow-md p-4 max-w-3xl">
+                        <div class="typing-indicator flex items-center space-x-1">
+                            <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                            <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                            <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        // Remove typing indicator
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        let conversations = [];
+        let currentConversationId = null;
+        let creatingServerConversation = false;
+
+        function generateId() {
+            return 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        }
+
+        function saveConversations() {
+            const payload = { list: conversations, currentId: currentConversationId };
+            localStorage.setItem('qa_conversations', JSON.stringify(payload));
+        }
+
+        function loadConversations() {
+            try {
+                const raw = localStorage.getItem('qa_conversations');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && Array.isArray(parsed.list) && parsed.list.length) {
+                        conversations = parsed.list;
+                        currentConversationId = parsed.currentId || parsed.list[0].id;
+                        updateConversationLabel();
+                        renderConversation();
+                        return;
+                    }
+                }
+            } catch (_) {}
+            const first = { id: generateId(), title: 'Conversation 1', messages: [] };
+            conversations = [first];
+            currentConversationId = first.id;
+            updateConversationLabel();
+            saveConversations();
+        }
+
+        function getCurrentConversation() {
+            return conversations.find(c => c.id === currentConversationId) || null;
+        }
+
+        function updateConversationLabel() {
+            const c = getCurrentConversation();
+            conversationLabel.textContent = c ? c.title : '';
+        }
+
+        function getUserId() {
+            try {
+                const u = getCurrentUser();
+                return (u && (u._id || u.userId)) || '';
+            } catch (_) { return ''; }
+        }
+
+        async function ensureServerConversation() {
+            const c = getCurrentConversation();
+            if (!c || c.serverId || creatingServerConversation) return c;
+            try {
+                creatingServerConversation = true;
+                const res = await apiRequest('/conversations', {
+                    method: 'POST',
+                    body: JSON.stringify({ title: c.title, messages: [] })
+                });
+                if (res && (res.id || res._id)) {
+                    c.serverId = res.id || res._id;
+                    saveConversations();
+                }
+            } finally {
+                creatingServerConversation = false;
+            }
+            return c;
+        }
+
+        async function saveMessageToServer(message, isUser) {
+            const c = await ensureServerConversation();
+            if (!c || !c.serverId) return;
+            try {
+                await apiRequest(`/conversations/${c.serverId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ title: c.title, messages: c.messages })
+                });
+            } catch (_) {}
+        }
+
+        function renderUserMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-enter flex items-start space-x-3 justify-end';
+            messageDiv.innerHTML = `
+                <div class="flex-1 flex justify-end">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl rounded-tr-none shadow-md p-4 max-w-3xl">
+                        <p class="leading-relaxed">${escapeHtml(message)}</p>
+                    </div>
+                </div>
+                <div class="flex-shrink-0 bg-slate-300 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+            `;
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function renderAIMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-enter flex items-start space-x-3';
+            messageDiv.innerHTML = `
+                <div class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="bg-white rounded-2xl rounded-tl-none shadow-md p-4 max-w-3xl">
+                        <p class="text-slate-800 leading-relaxed whitespace-pre-wrap">${escapeHtml(message)}</p>
+                    </div>
+                    <span class="text-xs text-slate-500 mt-1 block ml-1">AI Assistant • Just now</span>
+                </div>
+            `;
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function renderConversation() {
+            const messages = chatContainer.querySelectorAll('.message-enter');
+            messages.forEach((msg, index) => {
+                if (index > 0) {
+                    msg.remove();
+                }
+            });
+            const c = getCurrentConversation();
+            if (!c) return;
+            for (const m of c.messages) {
+                if (m.role === 'user') renderUserMessage(m.content);
+                else if (m.role === 'ai') renderAIMessage(m.content);
+            }
+        }
+
+        // Handle form submission
+        questionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // Disable form
+            submitBtn.disabled = true;
+            questionInput.disabled = true;
+
+            // Add user message
+            addUserMessage(question);
+            questionInput.value = '';
+
+            addTypingIndicator();
+
+            await new Promise(r => setTimeout(r, 300));
+            removeTypingIndicator();
+
+            const answer = getPredefinedAnswer(question);
+            if (answer) {
+                addAIMessage(answer);
+            } else {
+                addAIMessage('I currently answer only predefined questions. Try a suggested one.');
+            }
+
+            submitBtn.disabled = false;
+            questionInput.disabled = false;
+            questionInput.focus();
+        });
+
+        // Handle suggested questions
+        suggestedQuestions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.querySelector('p').textContent;
+                questionInput.value = question;
+                questionInput.focus();
+            });
+        });
+
+        clearChatBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                const c = getCurrentConversation();
+                if (c) {
+                    try {
+                        const snapshot = { userId: getUserId(), id: c.id, title: c.title, messages: c.messages, event: 'clear' };
+                        apiRequest('/deleted-conversations', { method: 'POST', body: JSON.stringify(snapshot) });
+                    } catch (_) {}
+                    c.messages = [];
+                    saveConversations();
+                }
+                const messages = chatContainer.querySelectorAll('.message-enter');
+                messages.forEach((msg, index) => {
+                    if (index > 0) {
+                        msg.remove();
+                    }
+                });
+            }
+        });
+
+        newConversationBtn.addEventListener('click', () => {
+            const hasMessages = chatContainer.querySelectorAll('.message-enter').length > 1;
+            if (hasMessages && !confirm('Start a new conversation? This will clear the current chat.')) return;
+            const conv = { id: generateId(), title: 'Conversation ' + (conversations.length + 1), messages: [] };
+            conversations.push(conv);
+            currentConversationId = conv.id;
+            updateConversationLabel();
+            saveConversations();
+            renderConversation();
+            ensureServerConversation();
+        });
+
+        deleteConversationBtn.addEventListener('click', async () => {
+            if (!getCurrentConversation()) return;
+            if (!confirm('Delete this conversation?')) return;
+            const toDelete = getCurrentConversation();
+            if (toDelete) {
+                try {
+                    const snapshot = { userId: getUserId(), id: toDelete.id, title: toDelete.title, messages: toDelete.messages, reason: 'delete' };
+                    await apiRequest('/deleted-conversations', { method: 'POST', body: JSON.stringify(snapshot) });
+                } catch (_) {}
+            }
+            if (toDelete && toDelete.serverId) {
+                try { await apiRequest(`/conversations/${toDelete.serverId}`, { method: 'DELETE' }); } catch (_) {}
+            }
+            conversations = conversations.filter(c => c.id !== currentConversationId);
+            if (!conversations.length) {
+                const first = { id: generateId(), title: 'Conversation 1', messages: [] };
+                conversations = [first];
+            }
+            currentConversationId = conversations[conversations.length - 1].id;
+            updateConversationLabel();
+            saveConversations();
+            renderConversation();
+        });
+
+        // Allow Enter to submit (Shift+Enter for new line)
+        questionInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                questionForm.dispatchEvent(new Event('submit'));
+            }
+        });
+        loadConversations();
+    </script>
+</body>
+</html>

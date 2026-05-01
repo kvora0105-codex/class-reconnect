@@ -1,0 +1,264 @@
+
+1. Explain Stack and Queue as Abstract data types
+2. Explain the types of Data Structures with diagram
+3. Explain the types of Linear DS
+4. Explain the types of Nonlinear DS
+5. What do you understand about stack overflow and underflow
+6. Explain Abstract data types
+7. Explain stack data structure with algorithm using example
+8. Explain Queue DS with algorithm and using example
+9. Explain the various operations performed on stack
+10. Explain various operations performed on queue
+11. Explain the concept of a circular queue and How is it better than a linear queue
+12. Explain how recursion can be used in stack
+13. Explain push and pop operations of stack with algorithm
+14. Explain the enqueue() and dequeue() operations of queue with algorithm
+15. Write algorithm for circular queue insertion and deletion
+16. Write algorithm for double ended queue insertion at the front, at the back, deletion at the front and deletion at the back
+17. Explain priority queue with example
+18. Explain well-formedness of parenthesis using algorithm and example
+19. Make a comparison between a linked list and a linear array. Which one will you prefer to use and when? Take example of insertion of       numbers into array and Linked list. Apply insertion at beginning and compare the result.
+20. Write algorithm for SLL insertion and deletion.
+21. Why is a doubly linked list more useful than a singly linked list?
+22. Write an algorithm for performing various insertion operations on doubly linked list:
+   a) Insertion at the beginning
+   b) Insertion at the end
+   c) Insertion in the middle
+23. Form a single linked list to store students’ roll numbers [1,2,3,4,5,6]. Use the single 	linked list to insert the record of a new student at the beginning of the list. 	Show step-wise execution of insertion.
+  	 Delete the last record from the list. Show step-wise deletion process using 	pointers.
+24. Write an algorithm to delete the middle element of a singly linked list. Show the 	representation.
+25. Explain Circular Linked List.
+26. Write an algorithm for performing various deletion operations on doubly linked list:
+   a) Deletion at the beginning
+   b) Deletion at the end
+   c) Deletion in the middle
+27. Explain memory representation of Linked List with diagram.
+28. Write algorithms for performing the various operations performed on Linked List:
+    a) Traversing a list
+    b) Counting number of nodes in a list
+    c) Searching an element in the list
+29. Write and explain the algorithm for Linked implementation of stack
+30. Write and explain the algorithm for Linked implementation of Queue
+31. Explain how polynomial addition is performed using Linked List
+32. Explain Binary search tree and its operations.
+33. Construct binary search tree for the following elements: 23, 45, 78, 15, 12, 3, 6, 9, 49, 99, 56, 88, 11, 14, 41.
+	Perform deletion of 44 and 14.
+34. Explain expression tree. Also study how to construct expression tree from a given 	expression.
+35. Construct AVL tree for the following elements: 20, 24, 30, 15, 18, 32, 40.
+36. Study problems on inorder/preorder/post order traversal.
+37. Create a Huffman tree with the following data:
+	A 7, B 9, C 11, D 14, E 18, F 19, G 27, H 29, I 35, J 40.
+38. Construct B tree for the following elements: 3, 14, 7, 1, 8, 5, 11, 17, 13, 6, 23, 12,   	20, 26, 4, 16, 18, 24, 25, 19.
+	Delete 24, 20, 5.
+39. Explain graph traversal techniques in detail with examples
+40. Explain How is graph represented in memory with diagram and example
+41. Apply linear probing hash functions to insert values in the Hash table of size 11. Show the number of collisions that occur in each technique.
+	27, 72, 63, 42, 36, 18, 29, 101
+42. Consider a hash table with size = 10. Using quadratic probing, insert the keys 12, 34, 45, 36, 34, 18, 29, and 101 into the table. Take c1 = 1, c2 = 3.
+43. Compare and Contrast Linear search and Binary search algorithm.
+44. What is collision? Explain the various techniques to resolve a collision. Which technique do you think is better and why?
+45. Using the modulo division method, hash the following elements in a table of size 10. Use Linear probing to resolve the collisions.
+	28, 55, 71, 67, 11, 10, 90, 44
+46. Explain Linear search algorithm with example.
+47. Explain Binary search with algorithm and example.
+48. Explain the various Hash functions with example.
+
+49. Describe characteristics of the database.
+50. Drawbacks of file system.
+51. Define database system.
+52. What are the advantages of database system over file system?
+53. Differentiate file system and database system with example.
+54. Applications of DBMS.
+55. Explain three schema architecture with diagram and example (internal level, conceptual level, external level).
+56. Explain in detail data independence with diagram and example (Logical data independence and physical data independence).
+57. Explain DBMS architecture with diagram.
+58. Explain different database applications.
+59. List and explain DBMS Languages
+60. Explain data abstraction levels using a suitable diagram
+61. What are the different types of database users? Explain each
+62. What do you mean by two-level and three-level architecture? Explain with diagram
+63. Explain the functions/responsibilities of a Database Administrator
+64. What are the different types of attributes in ER diagram?
+65. Define entity type, entity set, weak entity, regular entity, total participation,
+	partial participation.
+66. Define primary key, foreign key, candidate key, super key with example
+67. Explain with example specialization and Generalization.
+68. Explain overlapping, disjoint.
+69. List and explain three main components of ER Diagram
+70. Difference between strong and weak entity
+71. What are the different types of Cardinality Constraints?
+72. Explain features of EER Diagram
+73. Explain Aggregation with example.
+74. Compare a weak and a strong entity set with some examples and diagram.
+75. Explain the distinction between disjoint and overlapping constraints.
+76. Explain the distinction between total and partial constraints.
+77. What are the basic constructs of the ER model ?Explain it.
+78. Distinguish between simple and composite attributes
+79. Distinguish between strong entity and weak entity
+80. What is aggregation? Explain with an example?
+81. Write a short note on extended features of ERD.
+82. What is mean by key? Explain its types.
+83. Explain shared subclasses with examples.
+84. Explain following relational algebra operations with examples
+	i) Set Intersection
+	ii) Projection
+	iii) Natural Join
+	iv) Aggregation Operation
+	v) Union
+	vi) Cartesian Product
+	vii) Outer Join
+	viii) Aggregate Functions
+	ix) Division
+	x) Difference
+	xi) Rename
+85. Explain relational algebra queries and relational calculus with examples
+86. Explain types of Joins with examples.
+87. Explain relational algebra operators
+88. Write syntax and example of following relational algebra operations. cross join,
+	equi join and outer join. Identify and write, which join operation is suitable in which situation.
+89.Explain referential integrity and authorization in SQL
+90. Explain aggregate functions and set operations in sql with examples.
+91. Consider the following relations for database that keeps track of student enrollment in courses and book 	issued for each course
+	a) Student (Ssn,Name,Subject ,Dob)
+	b) Course (Course_id, Name,Dept)
+	c) Enroll (Ssn,Course_id,Semester,Grade)
+	d) Book_issued (Course_id,Semester,ISBN)
+	e) Text(ISBN,Title,Publisher,Author)
+	Write following queries in relational Algebra
+	a) Write a query to select all courses available in institute
+	b) Find all student details registered for course_id is 10
+	c) Find various book titles and authors for semester higher than 3
+	d) Find all students belonging to Computer Department
+	e) Find all students enrolled for above course_id
+92. Write trigger syntax and examples by considering your own tables.
+93. What are advantages and disadvantages of triggers
+94. What is a view? How it is created and stored?
+95. What are types of views?
+96. What are advantages and disadvantages of views?
+97. Explain integrity constraints with examples
+98. Explain referential constraints and describe problems that can lead to foreign key violations
+99. Differentiate between DDL and DML
+100. Expain different types of Joins with examples
+101. Explain pitfalls in relational database design
+102. Explain design guidelines for relational schema
+103. What is normalization?Explain 1NF,2NF,3NF, and BCNF with examples.
+104. Define normalization.Discuss different normalization techniques with examples.
+105. Define Normalization. What is the use of Normal forms?
+106. How can you identify the relations is in 1NF or 2NF give suitable examples
+107. List and explain different types of Functional dependency.
+108. List and explain Armstrong axioms with examples
+109. What is a deadlock? How is it detected ?Discuss different types of deadlock prevention schemes.
+110. Explain timestamp ordering protocol and Thomas write rule.
+111. Explain log based recovery
+112. Explain implementation of atomicity and durability
+113. Explain lock based,timestamp based
+114. What is log ?Explain log based recovery.
+115. What is 2PL ?Explain 2PL (2-Phase)locking protocol with its types.
+116. Describe View serializability with an example.
+117. Write a Note on (a) Timestamp based Protocol (b) Transaction state diagram
+118. What are the ACID properties?explain with examples.
+119. Discuss conflict serializability and view serializability with example
+120. Describe the concept of serializability with its types.
+121. What is a deadlock? Explain how deadlock can be handled.
+122. What do you mean by serial and non-serial schedule?
+123. Define Consistency property of Transaction with example
+124. Explain transaction concept. What are the various transaction states?
+125. What do you mean by deadlock in transactions?
+126. Define Deadlock and Explain Deadlock Detection, Prevention and Recovery
+127. What do you mean by conflicting instructions and non-conflicting instructions? Explain with proper 	examples.
+128. Explain conflict serializability with example?
+129. Convert (163.13)10 to binary, octal, and Hexadecimal equivalent CO1
+130. Convert (127.125)10 in IEEE-754 single and double precision floating point representation.
+
+131. Solve the following: 
+	i) Perform BCD addition 49 + 52 =?
+	2) Perform (21 -17) 10 using 2’s complement method
+	3) Perform Hex addition 2A + B9 =?
+132. Multiply (-13)10 and (+4)10 using Booth’s Algorithm. 
+133. Draw the flow chart of non-restoring division algorithm and Perform (11/3)10 CO2
+134. Design a full adder using half adders and few gates. 
+135. Design 8:1-multiplexer using 4:1 Multiplexer with circuit diagram
+136. 2’s complement of 11001011 is? 
+137. Convert (a) 10010011101011012 to Octal (b) 10010001011.001011102 to hexadecimal
+138. Perform the following addition using BCD and Excess-3 addition (205+569) 
+139. Convert FACE16 into its binary, octal, and decimal equivalent 
+140. Convert 23.62510 to binary, octal, and decimal equivalent
+141. In details explain IEEE 754 floating point representation for double precision and explain its various 	fields and types.
+142. In details explain IEEE 754 floating point representation for single precision and
+	explain its various fields and types.
+143. Evaluate and represent (85.125) 10 in single precision binary IEEE 754 floating point formats.
+144. State and prove De-Morgan’s theorem 
+145. Perform the following-
+	i) Convert (340) 10 to excess-3 code. (1mark)
+	ii) Convert Hexadecimal to decimal: DADA (2 mark)
+	iii) Hexadecimal to binary conversion: 3A9D (2 mark)
+
+146. Explain different types of codes used in digital systems with example. 
+147. Differentiate between Computer Organization and Computer Architecture. 
+148. Explain the role of various registers used in Von Neumann Architecture 
+149. Give the block level description of various functional units of a computer. 
+150. Perform (2)10 - (5)10 using 1’s complement method 
+151. Perform (2)10 - (5)10 using 2’s complement method(use 8 Bit word) 
+152. Perform (87)10 – (39)10 in BCD using 9s compliment. 
+153. Subtract (1010)2 from (1111)2 using 2&#39;s complement method. 
+154. Perform (25)10 – (34)10 in BCD using 9s compliment. 
+155. Perform (8)10 – (3)10 in BCD using 9s compliment. 
+156. Perform (F9AC-D4C7) using Hexadecimal arithmetic 
+157. Perform (ADD - DAD) using Hexadecimal arithmetic 
+158. Convert (a) (475.25)8 to its decimal equivalent
+	(b) (549.B4)16 to its binary equivalent
+	(c) Number 85 in BCD code is
+159. Multiply (17) and (5) using Booth’s algorithm. 
+160. Explain ASCII code in detail with its applications. 
+161. Determine (377)10 in Octal, Binary and Hexa-Decimal equivalent. 
+162. Convert 14316 into its binary, octal, Hexadecimal and binary coded decimal equivalent. 
+163. Convert 11510 and 23510 to hexadecimal numbers. 
+164. Explain NOR as a universal logic gate. 
+165. Explain NAND as a universal logic gate. 
+166. Explain Booths multiplication algorithm with a Flowchart. 
+167. Multiply (-7) and (3) using Booth’s Algorithm. 
+168. Multiply (12) and (4) using Booth’s Algorithm. 
+169. Perform restoring division for 13 divides 4 using non-restoring division algorithm 
+170. perform division of 1000 and 0011 using a restoring division algorithm 
+171. Implement Half adder using logic gates. 
+172. Explain Full adder in detail. 
+173. Design a full adder using half adders and few gates. 
+174. Design 4:1-multiplexer with circuit diagram 
+175. Design 8:1-multiplexer using 4:1 Multiplexer with circuit diagram
+176. Describe characteristics of memory
+177. Explain Memory Hierarchy in detail
+178. Explain Types of RAM and ROM
+179. Differentiate RAM and ROM
+180. Describe the role of Cache Memory with its operation
+181. Describe Cache coherence and write policies
+182. Explain locality of reference in Detail.
+183. Explain Interleaved Memory in Detail.
+184. Explain Associative Memory in Detail.
+185. Basic Pipelined Data path and control in Detail
+186. List the different sorts of data dependencies in the pipelined architecture with example.
+187. Explain Data dependencies in detail.
+188. Explain Data hazards in detail.
+189. Explain Branch hazards in detail.
+190. Explain Structural hazards in detail.
+191. Define the terms of Performance measures-CPI, Speedup, Efficiency, and Throughput.
+192. Discuss the concept of delayed branch
+193. Explain branch prediction in detail.
+194. Describe characteristics of Hardwired Control Unit
+195. Describe Architecture of Hardwired Control Unit
+196. Describe or Explain State Table Design Method of the Control Unit. /
+197. Explain Rules for Delay-element Method of Hardwired Control Unit
+198. Describe or Explain Delay-element Design Method of the Control Unit. /
+199. Explain Architecture of Micro-programmed Control Organization
+200. Describe Architecture of Micro-programmed Control Unit
+201. Describe Micro Instruction-Format
+202. Explain Advantages and Disadvantages of Hardwired Control unit.
+203. Explain Advantages and Disadvantages of Micro programmed Control Unit.
+204. Differentiate between Hardwired Control Unit and Micro programmed Control Unit.
+205. Explain Micro operations with example.
+
+206. Find 𝐿 (sin𝑡sin5𝑡/t) 
+207. Find the orthogonal trajectory of family of curve 3𝑥𝑦 − 𝑦 = 𝑐 
+208. Find 𝐿(cos 𝑡 cos 2𝑡 cos 3𝑡) 
+209. Prove that f(z) = (x^3 − 3xy^2 + 2xy) + i(3yx^2 − x^2 + y^2 − y^3) is analytic and find 
+	f ′(z) in terms of z.
+210.  Find an analytic function whose imaginary part is v = (y sin y + x cos y)e^−x. 

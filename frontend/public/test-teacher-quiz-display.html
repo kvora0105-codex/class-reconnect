@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Teacher Quiz Display - Load Available Quizzes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .test-result { margin: 10px 0; }
+        .quiz-item { background: #f5f5f5; padding: 10px; margin: 5px 0; border-radius: 3px; border-left: 4px solid #007bff; }
+        .teacher-quiz { border-left-color: #28a745; }
+        .mock-controls { background: #e9ecef; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        button { margin: 5px; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .filter-section { background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Test: Load Available Quizzes - Teacher-Created Quiz Display</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <div class="mock-controls">
+            <button class="btn-primary" onclick="createTeacherQuiz()">Create Teacher Quiz</button>
+            <button class="btn-success" onclick="createStudentQuiz()">Create Student Quiz</button>
+            <button class="btn-info" onclick="loadAvailableQuizzes()">Load Available Quizzes</button>
+            <button class="btn-primary" onclick="clearAllData()">Clear All Data</button>
+        </div>
+        
+        <div class="filter-section">
+            <h3>Mock Filters (Simulate Student View)</h3>
+            <label>Branch: 
+                <select id="mock-branch" onchange="loadAvailableQuizzes()">
+                    <option value="">All Branches</option>
+                    <option value="COMPS" selected>COMPS</option>
+                    <option value="IT">IT</option>
+                    <option value="AIDS">AIDS</option>
+                </select>
+            </label>
+            <label>Semester: 
+                <select id="mock-semester" onchange="loadAvailableQuizzes()">
+                    <option value="">All Semesters</option>
+                    <option value="Semester 3" selected>Semester 3</option>
+                    <option value="Semester 5">Semester 5</option>
+                </select>
+            </label>
+            <label>Subject: 
+                <select id="mock-subject" onchange="loadAvailableQuizzes()">
+                    <option value="">All Subjects</option>
+                    <option value="CSE">CSE</option>
+                    <option value="MATHS">MATHS</option>
+                    <option value="PHYSICS">PHYSICS</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Available Quizzes (Simulated Student View)</h2>
+        <div id="available-quizzes-container">
+            <p>Click "Load Available Quizzes" to see teacher-created quizzes</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>All Quizzes in System</h2>
+        <div id="all-quizzes">
+            <p>No quizzes created yet</p>
+        </div>
+    </div>
+
+    <script>
+        // Mock user data - simulate a student
+        const mockStudent = {
+            id: 'student_001',
+            name: 'Test Student',
+            branch: 'COMPS',
+            semester: 'Semester 3',
+            role: 'student'
+        };
+
+        // Mock teacher data
+        const mockTeacher = {
+            id: 'teacher_001',
+            name: 'Test Teacher',
+            branch: 'COMPS',
+            semester: 'Semester 3',
+            role: 'teacher'
+        };
+
+        // Initialize localStorage
+        function initializeStorage() {
+            if (!localStorage.getItem('currentUser')) {
+                localStorage.setItem('currentUser', JSON.stringify(mockStudent));
+            }
+            if (!localStorage.getItem('quizzes')) {
+                localStorage.setItem('quizzes', JSON.stringify([]));
+            }
+        }
+
+        // Create a quiz as a teacher
+        function createTeacherQuiz() {
+            const quiz = {
+                id: 'quiz_teacher_' + Date.now(),
+                name: 'Teacher Created Quiz - ' + new Date().toLocaleTimeString(),
+                duration: 30,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 5,
+                setPaper: '',
+                createdAt: new Date().toISOString(),
+                createdBy: mockTeacher.id,
+                questions: [
+                    {
+                        question: "What is a data structure?",
+                        options: ["A way to store data", "A programming language", "A type of computer", "An algorithm"],
+                        correct: 0
+                    },
+                    {
+                        question: "What is the time complexity of binary search?",
+                        options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
+                        correct: 1
+                    }
+                ]
+            };
+
+            let quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            quizzes.push(quiz);
+            localStorage.setItem('quizzes', JSON.stringify(quizzes));
+
+            addTestResult('Teacher Quiz Created', true, `Created quiz: ${quiz.name}`);
+            updateAllQuizzesDisplay();
+        }
+
+        // Create a quiz as a student (should not be visible to other students)
+        function createStudentQuiz() {
+            const quiz = {
+                id: 'quiz_student_' + Date.now(),
+                name: 'Student Created Quiz - ' + new Date().toLocaleTimeString(),
+                duration: 20,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'MATHS',
+                numQuestions: 3,
+                setPaper: '',
+                createdAt: new Date().toISOString(),
+                createdBy: mockStudent.id,
+                questions: []
+            };
+
+            let quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            quizzes.push(quiz);
+            localStorage.setItem('quizzes', JSON.stringify(quizzes));
+
+            addTestResult('Student Quiz Created', true, `Created quiz: ${quiz.name}`);
+            updateAllQuizzesDisplay();
+        }
+
+        // Simulate the loadStudentQuizzes function from index.html
+        function loadAvailableQuizzes() {
+            console.log('Loading available quizzes for student...');
+            
+            // Get current user (student)
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            // Get filter values from mock UI
+            const filterBranch = document.getElementById('mock-branch').value;
+            const filterSemester = document.getElementById('mock-semester').value;
+            const filterSubject = document.getElementById('mock-subject').value;
+            
+            // Get student info for filtering
+            const studentBranch = currentUser?.branch || '';
+            const studentSemester = currentUser?.semester || '';
+            
+            // Get all quizzes from localStorage
+            let quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            
+            console.log('Total quizzes in system:', quizzes.length);
+            
+            // Apply filters - students can only see quizzes that match their branch and semester
+            const filteredQuizzes = quizzes.filter(quiz => {
+                const matchesBranch = !filterBranch || quiz.branch === filterBranch;
+                const matchesSemester = !filterSemester || quiz.semester === filterSemester;
+                const matchesSubject = !filterSubject || quiz.subject === filterSubject;
+                
+                // Additional safety: only show quizzes that match student's branch and semester
+                const matchesStudentBranch = !studentBranch || quiz.branch === studentBranch;
+                const matchesStudentSemester = !studentSemester || quiz.semester === studentSemester;
+                
+                return matchesBranch && matchesSemester && matchesSubject && matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            console.log('Filtered quizzes for student:', filteredQuizzes.length);
+            
+            // Display results
+            displayAvailableQuizzes(filteredQuizzes);
+            
+            // Test results
+            addTestResult('Load Available Quizzes', true, `Found ${filteredQuizzes.length} quiz(es) matching criteria`);
+            
+            // Check if teacher-created quizzes are included
+            const teacherQuizzes = filteredQuizzes.filter(quiz => quiz.createdBy && quiz.createdBy.includes('teacher'));
+            addTestResult('Teacher Quizzes Visible', teacherQuizzes.length > 0, `${teacherQuizzes.length} teacher-created quiz(es) visible`);
+            
+            // Check filtering logic
+            const wrongBranchQuizzes = quizzes.filter(quiz => quiz.branch !== studentBranch);
+            const visibleWrongBranch = filteredQuizzes.filter(quiz => quiz.branch !== studentBranch);
+            addTestResult('Branch Filtering', visibleWrongBranch.length === 0, `Filtered out ${wrongBranchQuizzes.length} wrong-branch quizzes`);
+        }
+
+        // Display available quizzes in the UI
+        function displayAvailableQuizzes(quizzes) {
+            const container = document.getElementById('available-quizzes-container');
+            
+            if (quizzes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <p>No quizzes available matching your criteria</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Try adjusting filters or create some quizzes first</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = quizzes.map(quiz => `
+                <div class="quiz-item ${quiz.createdBy && quiz.createdBy.includes('teacher') ? 'teacher-quiz' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="font-weight: bold; margin: 0;">${quiz.name}</h4>
+                            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span style="background: #e3f2fd; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${quiz.subject}</span>
+                                <span style="background: #f3e5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${quiz.semester}</span>
+                                <span style="background: #e8f5e8; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${quiz.branch}</span>
+                                <span style="background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${quiz.numQuestions} questions</span>
+                                <span style="background: #e0f2f1; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${quiz.duration} min</span>
+                                ${quiz.setPaper ? `<span style="background: #ffecb3; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${quiz.setPaper}</span>` : ''}
+                            </div>
+                            <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">
+                                Created by: ${quiz.createdBy.includes('teacher') ? 'Teacher' : 'Student'} | 
+                                Created: ${new Date(quiz.createdAt).toLocaleDateString()}
+                            </p>
+                        </div>
+                        <button style="background: #28a745; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px;" onclick="startQuiz('${quiz.id}')">
+                            Start Quiz
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update display of all quizzes
+        function updateAllQuizzesDisplay() {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const container = document.getElementById('all-quizzes');
+            
+            if (quizzes.length === 0) {
+                container.innerHTML = '<p>No quizzes created yet</p>';
+                return;
+            }
+            
+            container.innerHTML = quizzes.map(quiz => `
+                <div class="quiz-item" style="border-left-color: ${quiz.createdBy.includes('teacher') ? '#28a745' : '#17a2b8'};">
+                    <h4>${quiz.name}</h4>
+                    <p>Created by: ${quiz.createdBy.includes('teacher') ? 'Teacher' : 'Student'} (${quiz.createdBy})</p>
+                    <p>Branch: ${quiz.branch} | Semester: ${quiz.semester} | Subject: ${quiz.subject}</p>
+                </div>
+            `).join('');
+        }
+
+        // Add test result
+        function addTestResult(testName, passed, message) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = `<span class="${passed ? 'pass' : 'fail'}">${passed ? '✓' : '✗'}</span> ${testName}: ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        // Clear all data
+        function clearAllData() {
+            localStorage.removeItem('quizzes');
+            localStorage.setItem('quizzes', JSON.stringify([]));
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('available-quizzes-container').innerHTML = '<p>Click "Load Available Quizzes" to see teacher-created quizzes</p>';
+            document.getElementById('all-quizzes').innerHTML = '<p>No quizzes created yet</p>';
+            addTestResult('Data Cleared', true, 'All quiz data has been cleared');
+        }
+
+        // Mock start quiz function
+        function startQuiz(quizId) {
+            addTestResult('Quiz Started', true, `Started quiz with ID: ${quizId}`);
+            alert(`Starting quiz: ${quizId}`);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            initializeStorage();
+            updateAllQuizzesDisplay();
+            
+            // Add initial test result
+            addTestResult('System Initialized', true, 'Ready to test teacher quiz display functionality');
+        });
+    </script>
+</body>
+</html>

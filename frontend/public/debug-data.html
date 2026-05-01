@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Quiz Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+        .data { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 3px; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>Quiz System Debug</h1>
+    
+    <div class="section">
+        <h2>Current User Data</h2>
+        <div id="current-user"></div>
+    </div>
+    
+    <div class="section">
+        <h2>All Quizzes in Storage</h2>
+        <div id="all-quizzes"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Student Quiz Filtering Analysis</h2>
+        <div id="filtering-analysis"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Manual Filter Test</h2>
+        <button onclick="runManualFilter()">Run Manual Filter Test</button>
+        <div id="manual-filter-result"></div>
+    </div>
+
+    <script>
+        function getCurrentUser() {
+            try {
+                // Try to get from localStorage first
+                const stored = localStorage.getItem('currentUser');
+                if (stored) {
+                    return JSON.parse(stored);
+                }
+                
+                // If not found, try to get from auth API (simplified)
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return {
+                        id: payload.userId,
+                        name: payload.name,
+                        email: payload.email,
+                        role: payload.role,
+                        branch: payload.branch,
+                        semester: payload.semester
+                    };
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error getting current user:', error);
+                return null;
+            }
+        }
+
+        function getQuizzes() {
+            try {
+                const quizzes = localStorage.getItem('quizzes');
+                return quizzes ? JSON.parse(quizzes) : [];
+            } catch (error) {
+                console.error('Error getting quizzes:', error);
+                return [];
+            }
+        }
+
+        function analyzeUserData() {
+            const currentUser = getCurrentUser();
+            const userDiv = document.getElementById('current-user');
+            
+            if (!currentUser) {
+                userDiv.innerHTML = '<p class="error">No current user found!</p>';
+                return;
+            }
+            
+            userDiv.innerHTML = `
+                <div class="data">
+                    <p><strong>ID:</strong> ${currentUser.id || 'N/A'}</p>
+                    <p><strong>Name:</strong> ${currentUser.name || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${currentUser.email || 'N/A'}</p>
+                    <p><strong>Role:</strong> ${currentUser.role || 'N/A'}</p>
+                    <p><strong>Branch:</strong> ${currentUser.branch || 'N/A'}</p>
+                    <p><strong>Semester:</strong> ${currentUser.semester || 'N/A'}</p>
+                </div>
+            `;
+            
+            return currentUser;
+        }
+
+        function analyzeQuizzes() {
+            const quizzes = getQuizzes();
+            const quizzesDiv = document.getElementById('all-quizzes');
+            
+            if (quizzes.length === 0) {
+                quizzesDiv.innerHTML = '<p class="error">No quizzes found in storage!</p>';
+                return quizzes;
+            }
+            
+            let html = `<p class="success">Found ${quizzes.length} quizzes:</p>`;
+            quizzes.forEach((quiz, index) => {
+                html += `
+                    <div class="data">
+                        <p><strong>${index + 1}. ${quiz.name}</strong></p>
+                        <p><strong>ID:</strong> ${quiz.id}</p>
+                        <p><strong>Branch:</strong> ${quiz.branch || 'N/A'}</p>
+                        <p><strong>Semester:</strong> ${quiz.semester || 'N/A'}</p>
+                        <p><strong>Subject:</strong> ${quiz.subject || 'N/A'}</p>
+                        <p><strong>Created By:</strong> ${quiz.createdBy || 'N/A'}</p>
+                        <p><strong>Created At:</strong> ${quiz.createdAt || 'N/A'}</p>
+                        <p><strong>Questions:</strong> ${quiz.questions ? quiz.questions.length : 0}</p>
+                    </div>
+                `;
+            });
+            
+            quizzesDiv.innerHTML = html;
+            return quizzes;
+        }
+
+        function analyzeFiltering() {
+            const currentUser = getCurrentUser();
+            const quizzes = getQuizzes();
+            const analysisDiv = document.getElementById('filtering-analysis');
+            
+            if (!currentUser) {
+                analysisDiv.innerHTML = '<p class="error">Cannot analyze filtering: No current user!</p>';
+                return;
+            }
+            
+            if (quizzes.length === 0) {
+                analysisDiv.innerHTML = '<p class="error">Cannot analyze filtering: No quizzes available!</p>';
+                return;
+            }
+            
+            const studentBranch = currentUser?.branch || '';
+            const studentSemester = currentUser?.semester || '';
+            
+            let html = `
+                <div class="data">
+                    <p><strong>Student Branch:</strong> "${studentBranch}"</p>
+                    <p><strong>Student Semester:</strong> "${studentSemester}"</p>
+                </div>
+            `;
+            
+            const filteredQuizzes = quizzes.filter(quiz => {
+                const matchesStudentBranch = !studentBranch || quiz.branch === studentBranch;
+                const matchesStudentSemester = !studentSemester || quiz.semester === studentSemester;
+                
+                html += `
+                    <div class="data">
+                        <p><strong>Quiz:</strong> ${quiz.name}</p>
+                        <p><strong>Quiz Branch:</strong> "${quiz.branch || 'N/A'}"</p>
+                        <p><strong>Quiz Semester:</strong> "${quiz.semester || 'N/A'}"</p>
+                        <p><strong>Branch Match:</strong> ${matchesStudentBranch ? '<span class="success">YES</span>' : '<span class="error">NO</span>'}</p>
+                        <p><strong>Semester Match:</strong> ${matchesStudentSemester ? '<span class="success">YES</span>' : '<span class="error">NO</span>'}</p>
+                        <p><strong>Overall Match:</strong> ${matchesStudentBranch && matchesStudentSemester ? '<span class="success">VISIBLE</span>' : '<span class="error">HIDDEN</span>'}</p>
+                    </div>
+                `;
+                
+                return matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            html += `<p class="success">Total visible quizzes: ${filteredQuizzes.length}</p>`;
+            analysisDiv.innerHTML = html;
+        }
+
+        function runManualFilter() {
+            const currentUser = getCurrentUser();
+            const quizzes = getQuizzes();
+            const resultDiv = document.getElementById('manual-filter-result');
+            
+            if (!currentUser) {
+                resultDiv.innerHTML = '<p class="error">No current user found!</p>';
+                return;
+            }
+            
+            // Simulate the exact filtering logic from loadStudentQuizzes
+            const studentBranch = currentUser?.branch || '';
+            const studentSemester = currentUser?.semester || '';
+            
+            console.log('Manual filter test:');
+            console.log('Student branch:', studentBranch);
+            console.log('Student semester:', studentSemester);
+            console.log('Total quizzes:', quizzes.length);
+            
+            const filteredQuizzes = quizzes.filter(quiz => {
+                console.log('Checking quiz:', quiz.name);
+                console.log('Quiz branch:', quiz.branch);
+                console.log('Quiz semester:', quiz.semester);
+                
+                const matchesStudentBranch = !studentBranch || quiz.branch === studentBranch;
+                const matchesStudentSemester = !studentSemester || quiz.semester === studentSemester;
+                
+                console.log('Branch match:', matchesStudentBranch);
+                console.log('Semester match:', matchesStudentSemester);
+                console.log('Overall match:', matchesStudentBranch && matchesStudentSemester);
+                
+                return matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            resultDiv.innerHTML = `
+                <div class="data">
+                    <p><strong>Student Branch:</strong> "${studentBranch}"</p>
+                    <p><strong>Student Semester:</strong> "${studentSemester}"</p>
+                    <p><strong>Total Quizzes:</strong> ${quizzes.length}</p>
+                    <p><strong>Filtered Quizzes:</strong> ${filteredQuizzes.length}</p>
+                    <p><strong>Visibility:</strong> ${filteredQuizzes.length > 0 ? '<span class="success">QUIZZES VISIBLE</span>' : '<span class="error">NO QUIZZES VISIBLE</span>'}</p>
+                </div>
+            `;
+            
+            console.log('Filtered quizzes:', filteredQuizzes.length);
+        }
+
+        // Initialize the debug page
+        document.addEventListener('DOMContentLoaded', function() {
+            analyzeUserData();
+            analyzeQuizzes();
+            analyzeFiltering();
+        });
+    </script>
+</body>
+</html>
