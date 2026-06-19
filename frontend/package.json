@@ -1,0 +1,26 @@
+{
+  "name": "classreconnect-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for ClassReconnect - Student Learning Management System",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "npx http-server public -p 8080 -o",
+    "dev": "npx http-server public -p 8080 -o",
+    "build": "echo 'Frontend is static HTML/CSS/JS - no build step required'",
+    "serve": "npx http-server public -p 8080"
+  },
+  "keywords": [
+    "education",
+    "learning-management",
+    "student-portal",
+    "frontend"
+  ],
+  "author": "Karan Vora",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

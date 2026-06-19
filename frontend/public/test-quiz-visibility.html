@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quiz Visibility in Available Quizzes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .test-result { margin: 10px 0; }
+        .quiz-item { background: #f5f5f5; padding: 10px; margin: 5px 0; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Quiz Visibility Test - Available Quizzes Section</h1>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Available Quizzes (Simulated)</h2>
+        <div id="available-quizzes"></div>
+    </div>
+
+    <script>
+        // Mock localStorage and user functions
+        let mockLocalStorage = {};
+        
+        function mockSetItem(key, value) {
+            mockLocalStorage[key] = value;
+            localStorage.setItem(key, value);
+        }
+        
+        function mockGetItem(key) {
+            return mockLocalStorage[key] || localStorage.getItem(key);
+        }
+        
+        function mockGetCurrentUser() {
+            return { id: 'test_student_1', branch: 'COMPS', semester: 'Semester 3', name: 'Test Student' };
+        }
+        
+        // Mock createQuiz function (simplified from index.html)
+        function mockCreateQuiz(quizData) {
+            const quiz = {
+                id: 'quiz_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                name: quizData.name,
+                duration: quizData.duration,
+                branch: quizData.branch,
+                semester: quizData.semester,
+                subject: quizData.subject,
+                numQuestions: quizData.numQuestions,
+                setPaper: quizData.setPaper,
+                createdAt: new Date().toISOString(),
+                createdBy: mockGetCurrentUser().id,
+                questions: []
+            };
+            
+            // Save to localStorage
+            let quizzes = JSON.parse(mockGetItem('quizzes')) || [];
+            quizzes.push(quiz);
+            mockSetItem('quizzes', JSON.stringify(quizzes));
+            
+            console.log('Created quiz:', quiz.name, 'ID:', quiz.id);
+            return quiz;
+        }
+        
+        // Mock loadStudentQuizzes function (exact logic from index.html)
+        function mockLoadStudentQuizzes(filters = {}) {
+            const currentUser = mockGetCurrentUser();
+            
+            // Get filter values
+            const filterBranch = filters.branch || '';
+            const filterSemester = filters.semester || '';
+            const filterSubject = filters.subject || '';
+            
+            // Get current student info for filtering
+            const studentBranch = currentUser?.branch || '';
+            const studentSemester = currentUser?.semester || '';
+            
+            // Get quizzes from localStorage
+            let quizzes = JSON.parse(mockGetItem('quizzes')) || [];
+            
+            console.log('Total quizzes available:', quizzes.length);
+            
+            // Apply filters - students can only see quizzes that match their branch and semester
+            quizzes = quizzes.filter(quiz => {
+                const matchesBranch = !filterBranch || quiz.branch === filterBranch;
+                const matchesSemester = !filterSemester || quiz.semester === filterSemester;
+                const matchesSubject = !filterSubject || quiz.subject === filterSubject;
+                
+                // Additional safety: only show quizzes that match student's branch and semester
+                const matchesStudentBranch = !studentBranch || quiz.branch === studentBranch;
+                const matchesStudentSemester = !studentSemester || quiz.semester === studentSemester;
+                
+                return matchesBranch && matchesSemester && matchesSubject && matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            console.log('Filtered quizzes for student:', quizzes.length);
+            return quizzes;
+        }
+        
+        // Test functions
+        function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            const quizzesDiv = document.getElementById('available-quizzes');
+            let testsPassed = 0;
+            let totalTests = 0;
+            
+            function addTestResult(testName, passed, message) {
+                totalTests++;
+                if (passed) testsPassed++;
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'test-result';
+                resultDiv.innerHTML = `<span class="${passed ? 'pass' : 'fail'}">${passed ? '✓' : '✗'}</span> ${testName}: ${message}`;
+                resultsDiv.appendChild(resultDiv);
+            }
+            
+            function displayQuizzes(quizzes) {
+                if (quizzes.length === 0) {
+                    quizzesDiv.innerHTML = '<p>No quizzes available</p>';
+                } else {
+                    quizzesDiv.innerHTML = quizzes.map(quiz => `
+                        <div class="quiz-item">
+                            <strong>${quiz.name}</strong><br>
+                            Subject: ${quiz.subject} | Branch: ${quiz.branch} | Semester: ${quiz.semester}<br>
+                            Duration: ${quiz.duration} min | Questions: ${quiz.numQuestions}<br>
+                            Created: ${new Date(quiz.createdAt).toLocaleString()}
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            // Clear localStorage before tests
+            localStorage.clear();
+            mockLocalStorage = {};
+            
+            // Test 1: Initial state - no quizzes
+            let initialQuizzes = mockLoadStudentQuizzes();
+            addTestResult(
+                'Initial State - No Quizzes',
+                initialQuizzes.length === 0,
+                `Found ${initialQuizzes.length} quiz(es) initially`
+            );
+            displayQuizzes(initialQuizzes);
+            
+            // Test 2: Create a quiz matching student criteria
+            const matchingQuiz = {
+                name: 'Data Structures Quiz',
+                duration: 30,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 5,
+                setPaper: ''
+            };
+            
+            const createdQuiz1 = mockCreateQuiz(matchingQuiz);
+            let quizzesAfterCreate1 = mockLoadStudentQuizzes();
+            
+            addTestResult(
+                'Create Matching Quiz',
+                quizzesAfterCreate1.length === 1 && quizzesAfterCreate1[0].id === createdQuiz1.id,
+                `Created and found 1 quiz matching student criteria`
+            );
+            displayQuizzes(quizzesAfterCreate1);
+            
+            // Test 3: Create a quiz with wrong branch
+            const wrongBranchQuiz = {
+                name: 'Algorithms Quiz - Wrong Branch',
+                duration: 45,
+                branch: 'IT', // Wrong branch for COMPS student
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 8,
+                setPaper: ''
+            };
+            
+            mockCreateQuiz(wrongBranchQuiz);
+            let quizzesAfterWrong = mockLoadStudentQuizzes();
+            
+            addTestResult(
+                'Wrong Branch Quiz Filtered Out',
+                quizzesAfterWrong.length === 1, // Should still be 1 (only the first quiz)
+                `Found ${quizzesAfterWrong.length} quiz(es) - wrong branch quiz filtered out`
+            );
+            
+            // Test 4: Create a quiz with wrong semester
+            const wrongSemesterQuiz = {
+                name: 'Database Quiz - Wrong Semester',
+                duration: 40,
+                branch: 'COMPS',
+                semester: 'Semester 5', // Wrong semester
+                subject: 'CSE',
+                numQuestions: 6,
+                setPaper: ''
+            };
+            
+            mockCreateQuiz(wrongSemesterQuiz);
+            let quizzesAfterWrongSemester = mockLoadStudentQuizzes();
+            
+            addTestResult(
+                'Wrong Semester Quiz Filtered Out',
+                quizzesAfterWrongSemester.length === 1, // Should still be 1
+                `Found ${quizzesAfterWrongSemester.length} quiz(es) - wrong semester quiz filtered out`
+            );
+            
+            // Test 5: Create multiple matching quizzes
+            const matchingQuiz2 = {
+                name: 'Operating Systems Quiz',
+                duration: 35,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 7,
+                setPaper: ''
+            };
+            
+            const matchingQuiz3 = {
+                name: 'Computer Networks Quiz',
+                duration: 25,
+                branch: 'COMPS',
+                semester: 'Semester 3',
+                subject: 'CSE',
+                numQuestions: 4,
+                setPaper: ''
+            };
+            
+            mockCreateQuiz(matchingQuiz2);
+            mockCreateQuiz(matchingQuiz3);
+            
+            let finalQuizzes = mockLoadStudentQuizzes();
+            
+            addTestResult(
+                'Multiple Matching Quizzes',
+                finalQuizzes.length === 3, // Should now have 3 quizzes
+                `Found ${finalQuizzes.length} quiz(es) after adding multiple matching quizzes`
+            );
+            displayQuizzes(finalQuizzes);
+            
+            // Test 6: Test filtering by subject
+            const cseQuizzes = mockLoadStudentQuizzes({ subject: 'CSE' });
+            addTestResult(
+                'Subject Filter - CSE',
+                cseQuizzes.length === 3,
+                `Found ${cseQuizzes.length} CSE quiz(es) with subject filter`
+            );
+            
+            // Test 7: Test filtering by branch
+            const compsQuizzes = mockLoadStudentQuizzes({ branch: 'COMPS' });
+            addTestResult(
+                'Branch Filter - COMPS',
+                compsQuizzes.length === 3,
+                `Found ${compsQuizzes.length} COMPS quiz(es) with branch filter`
+            );
+            
+            // Test 8: Test combined filters
+            const filteredQuizzes = mockLoadStudentQuizzes({ subject: 'CSE', branch: 'COMPS', semester: 'Semester 3' });
+            addTestResult(
+                'Combined Filters',
+                filteredQuizzes.length === 3,
+                `Found ${filteredQuizzes.length} quiz(es) with combined filters`
+            );
+            
+            // Summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.marginTop = '20px';
+            summaryDiv.style.fontWeight = 'bold';
+            summaryDiv.innerHTML = `<hr><br>Test Summary: ${testsPassed}/${totalTests} tests passed`;
+            summaryDiv.className = testsPassed === totalTests ? 'pass' : 'fail';
+            resultsDiv.appendChild(summaryDiv);
+            
+            // Show final localStorage data
+            const dataDiv = document.createElement('div');
+            dataDiv.style.marginTop = '20px';
+            dataDiv.innerHTML = '<h3>Final localStorage Data:</h3><pre>' + JSON.stringify(JSON.parse(mockGetItem('quizzes') || '[]'), null, 2) + '</pre>';
+            resultsDiv.appendChild(dataDiv);
+            
+            console.log('Test completed. Final quizzes in localStorage:', JSON.parse(mockGetItem('quizzes') || '[]'));
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

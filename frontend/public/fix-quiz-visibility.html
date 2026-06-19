@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Quiz Visibility</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        .success { background: #4CAF50; color: white; }
+        .info { background: #2196F3; color: white; }
+        .warning { background: #ff9800; color: white; }
+        .data { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Fix Quiz Visibility Issue</h1>
+    
+    <div class="section">
+        <h2>Step 1: Set Up Teacher User</h2>
+        <button onclick="setupTeacher()" class="info">Setup Teacher User</button>
+        <div id="teacher-setup-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 2: Create Test Quiz</h2>
+        <button onclick="createTestQuiz()" class="info">Create Test Quiz</button>
+        <div id="quiz-creation-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 3: Switch to Student User</h2>
+        <button onclick="setupStudent()" class="info">Setup Student User</button>
+        <div id="student-setup-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 4: Test Quiz Visibility</h2>
+        <button onclick="testQuizVisibility()" class="success">Test Visibility</button>
+        <div id="visibility-test-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Quick Fix (Auto-Run)</h2>
+        <button onclick="runCompleteFix()" class="warning">Run Complete Fix</button>
+        <div id="complete-fix-result"></div>
+    </div>
+
+    <script>
+        function getCurrentUser() {
+            try {
+                const stored = localStorage.getItem('currentUser');
+                return stored ? JSON.parse(stored) : null;
+            } catch (error) {
+                console.error('Error getting current user:', error);
+                return null;
+            }
+        }
+
+        function setCurrentUser(user) {
+            try {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                return true;
+            } catch (error) {
+                console.error('Error setting current user:', error);
+                return false;
+            }
+        }
+
+        function getQuizzes() {
+            try {
+                const quizzes = localStorage.getItem('quizzes');
+                return quizzes ? JSON.parse(quizzes) : [];
+            } catch (error) {
+                console.error('Error getting quizzes:', error);
+                return [];
+            }
+        }
+
+        function saveQuizzes(quizzes) {
+            try {
+                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                return true;
+            } catch (error) {
+                console.error('Error saving quizzes:', error);
+                return false;
+            }
+        }
+
+        function setupTeacher() {
+            const teacher = {
+                id: 'teacher_001',
+                name: 'Test Teacher',
+                email: 'teacher@test.com',
+                role: 'teacher',
+                branch: 'CSE',
+                semester: 'Semester 1'
+            };
+            
+            if (setCurrentUser(teacher)) {
+                document.getElementById('teacher-setup-result').innerHTML = `
+                    <div class="data">
+                        <p class="success">Teacher user set up successfully!</p>
+                        <p><strong>ID:</strong> ${teacher.id}</p>
+                        <p><strong>Name:</strong> ${teacher.name}</p>
+                        <p><strong>Branch:</strong> ${teacher.branch}</p>
+                        <p><strong>Semester:</strong> ${teacher.semester}</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('teacher-setup-result').innerHTML = '<p class="error">Failed to set up teacher user!</p>';
+            }
+        }
+
+        function createTestQuiz() {
+            const currentUser = getCurrentUser();
+            if (!currentUser || currentUser.role !== 'teacher') {
+                document.getElementById('quiz-creation-result').innerHTML = '<p class="error">Please set up teacher user first!</p>';
+                return;
+            }
+            
+            const quiz = {
+                id: 'quiz_test_' + Date.now(),
+                name: 'Test Quiz - CSE Semester 1',
+                duration: 30,
+                branch: 'CSE',
+                semester: 'Semester 1',
+                subject: 'CSE',
+                numQuestions: 3,
+                setPaper: 'Set A',
+                createdAt: new Date().toISOString(),
+                createdBy: currentUser.id,
+                questions: [
+                    { question: "What is the time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n²)", "O(1)"], correctAnswer: 1 },
+                    { question: "Which data structure uses LIFO principle?", options: ["Queue", "Stack", "Tree", "Graph"], correctAnswer: 1 },
+                    { question: "What is the purpose of a constructor in OOP?", options: ["To destroy objects", "To initialize objects", "To copy objects", "To delete objects"], correctAnswer: 1 }
+                ]
+            };
+            
+            const quizzes = getQuizzes();
+            quizzes.push(quiz);
+            
+            if (saveQuizzes(quizzes)) {
+                document.getElementById('quiz-creation-result').innerHTML = `
+                    <div class="data">
+                        <p class="success">Test quiz created successfully!</p>
+                        <p><strong>Quiz ID:</strong> ${quiz.id}</p>
+                        <p><strong>Name:</strong> ${quiz.name}</p>
+                        <p><strong>Branch:</strong> ${quiz.branch}</p>
+                        <p><strong>Semester:</strong> ${quiz.semester}</p>
+                        <p><strong>Questions:</strong> ${quiz.questions.length}</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('quiz-creation-result').innerHTML = '<p class="error">Failed to save quiz!</p>';
+            }
+        }
+
+        function setupStudent() {
+            const student = {
+                id: 'student_001',
+                name: 'Test Student',
+                email: 'student@test.com',
+                role: 'student',
+                branch: 'CSE',
+                semester: 'Semester 1'
+            };
+            
+            if (setCurrentUser(student)) {
+                document.getElementById('student-setup-result').innerHTML = `
+                    <div class="data">
+                        <p class="success">Student user set up successfully!</p>
+                        <p><strong>ID:</strong> ${student.id}</p>
+                        <p><strong>Name:</strong> ${student.name}</p>
+                        <p><strong>Branch:</strong> ${student.branch}</p>
+                        <p><strong>Semester:</strong> ${student.semester}</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('student-setup-result').innerHTML = '<p class="error">Failed to set up student user!</p>';
+            }
+        }
+
+        function testQuizVisibility() {
+            const currentUser = getCurrentUser();
+            const quizzes = getQuizzes();
+            
+            if (!currentUser) {
+                document.getElementById('visibility-test-result').innerHTML = '<p class="error">No current user found!</p>';
+                return;
+            }
+            
+            const studentBranch = currentUser?.branch || '';
+            const studentSemester = currentUser?.semester || '';
+            
+            const filteredQuizzes = quizzes.filter(quiz => {
+                const matchesStudentBranch = !studentBranch || quiz.branch === studentBranch;
+                const matchesStudentSemester = !studentSemester || quiz.semester === studentSemester;
+                return matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            let html = `
+                <div class="data">
+                    <p><strong>Current User:</strong> ${currentUser.name} (${currentUser.role})</p>
+                    <p><strong>Branch:</strong> "${studentBranch}"</p>
+                    <p><strong>Semester:</strong> "${studentSemester}"</p>
+                    <p><strong>Total Quizzes:</strong> ${quizzes.length}</p>
+                    <p><strong>Visible Quizzes:</strong> ${filteredQuizzes.length}</p>
+            `;
+            
+            if (filteredQuizzes.length > 0) {
+                html += '<p class="success">✓ Quizzes are visible to student!</p>';
+                filteredQuizzes.forEach(quiz => {
+                    html += `<p> - ${quiz.name} (${quiz.branch} - ${quiz.semester})</p>`;
+                });
+            } else {
+                html += '<p class="error">✗ No quizzes visible to student!</p>';
+                
+                // Show detailed analysis
+                html += '<h4>Detailed Analysis:</h4>';
+                quizzes.forEach(quiz => {
+                    const branchMatch = quiz.branch === studentBranch;
+                    const semesterMatch = quiz.semester === studentSemester;
+                    html += `<p>${quiz.name}: Branch match=${branchMatch}, Semester match=${semesterMatch}</p>`;
+                });
+            }
+            
+            html += '</div>';
+            document.getElementById('visibility-test-result').innerHTML = html;
+        }
+
+        function runCompleteFix() {
+            // Clear existing data
+            localStorage.clear();
+            
+            // Step 1: Setup teacher
+            const teacher = {
+                id: 'teacher_001',
+                name: 'Test Teacher',
+                email: 'teacher@test.com',
+                role: 'teacher',
+                branch: 'CSE',
+                semester: 'Semester 1'
+            };
+            setCurrentUser(teacher);
+            
+            // Step 2: Create quiz
+            const quiz = {
+                id: 'quiz_test_' + Date.now(),
+                name: 'Test Quiz - CSE Semester 1',
+                duration: 30,
+                branch: 'CSE',
+                semester: 'Semester 1',
+                subject: 'CSE',
+                numQuestions: 3,
+                setPaper: 'Set A',
+                createdAt: new Date().toISOString(),
+                createdBy: teacher.id,
+                questions: [
+                    { question: "What is the time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n²)", "O(1)"], correctAnswer: 1 },
+                    { question: "Which data structure uses LIFO principle?", options: ["Queue", "Stack", "Tree", "Graph"], correctAnswer: 1 },
+                    { question: "What is the purpose of a constructor in OOP?", options: ["To destroy objects", "To initialize objects", "To copy objects", "To delete objects"], correctAnswer: 1 }
+                ]
+            };
+            
+            saveQuizzes([quiz]);
+            
+            // Step 3: Switch to student
+            const student = {
+                id: 'student_001',
+                name: 'Test Student',
+                email: 'student@test.com',
+                role: 'student',
+                branch: 'CSE',
+                semester: 'Semester 1'
+            };
+            setCurrentUser(student);
+            
+            // Step 4: Test visibility
+            const quizzes = getQuizzes();
+            const studentBranch = student.branch;
+            const studentSemester = student.semester;
+            
+            const filteredQuizzes = quizzes.filter(quiz => {
+                const matchesStudentBranch = !studentBranch || quiz.branch === studentBranch;
+                const matchesStudentSemester = !studentSemester || quiz.semester === studentSemester;
+                return matchesStudentBranch && matchesStudentSemester;
+            });
+            
+            document.getElementById('complete-fix-result').innerHTML = `
+                <div class="data">
+                    <h3>Complete Fix Results:</h3>
+                    <p><strong>Teacher Setup:</strong> ✓ ${teacher.name}</p>
+                    <p><strong>Quiz Created:</strong> ✓ ${quiz.name}</p>
+                    <p><strong>Student Setup:</strong> ✓ ${student.name}</p>
+                    <p><strong>Branch Match:</strong> "${quiz.branch}" === "${studentBranch}"</p>
+                    <p><strong>Semester Match:</strong> "${quiz.semester}" === "${studentSemester}"</p>
+                    <p><strong>Visible Quizzes:</strong> ${filteredQuizzes.length}</p>
+                    <p class="${filteredQuizzes.length > 0 ? 'success' : 'error'}">
+                        ${filteredQuizzes.length > 0 ? '✓ SUCCESS: Quizzes are visible!' : '✗ FAILED: No quizzes visible!'}
+                    </p>
+                </div>
+            `;
+            
+            // Show final data
+            document.getElementById('complete-fix-result').innerHTML += `
+                <div class="data">
+                    <h4>Final Data Check:</h4>
+                    <p><strong>Current User:</strong> ${JSON.stringify(getCurrentUser(), null, 2)}</p>
+                    <p><strong>Quizzes:</strong> ${JSON.stringify(getQuizzes(), null, 2)}</p>
+                </div>
+            `;
+        }
+
+        // Auto-run the complete fix on page load
+        window.addEventListener('load', function() {
+            setTimeout(runCompleteFix, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Group Discovery • ClassReconnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for webkit browsers */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 2px;
+        }
+        /* Sidebar nav links */
+        .cr-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            margin-bottom: 2px;
+        }
+        .cr-nav-link:hover {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        .cr-nav-link.active {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+        .cr-nav-link svg { flex-shrink: 0; opacity: 0.85; }
+        .cr-nav-link.active svg { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="flex min-h-screen">
+
+
+<div class="lg:ml-64 flex-1 min-h-screen">
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Smart Group Discovery</h1>
+                <p class="text-slate-500 mt-2">Find study groups that match your goals, availability, and interests</p>
+            </div>
+            <a href="index.html" class="text-blue-600 hover:underline font-medium">Back to Dashboard</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">Your Preferences</h2>
+                    <form id="preferences-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Study Goal</label>
+                            <select id="study-goal" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Exam Prep">Exam Prep</option>
+                                <option value="Homework Help">Homework Help</option>
+                                <option value="Long-term Learning">Long-term Learning</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Availability</label>
+                            <select id="availability" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Morning (6AM-12PM)">Morning (6AM-12PM)</option>
+                                <option value="Afternoon (12PM-6PM)">Afternoon (12PM-6PM)</option>
+                                <option value="Evening (6PM-12AM)">Evening (6PM-12AM)</option>
+                                <option value="Night Owl (12AM-6AM)">Night Owl (12AM-6AM)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Granular Tags (comma separated)</label>
+                            <input type="text" id="tags-input" placeholder="e.g., Linear Algebra, Data Structures, SQL" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Save Preferences
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">Create New Group</h2>
+                    <form id="create-group-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Group Name</label>
+                            <input type="text" id="group-name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                            <textarea id="group-description" rows="2" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+                                <select id="group-branch" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                                    <option value="COMPS">COMPS</option>
+                                    <option value="IT">IT</option>
+                                    <option value="AIDS">AIDS</option>
+                                    <option value="EXTC">EXTC</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Semester</label>
+                                <select id="group-semester" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                                    <option value="Semester 1">Semester 1</option>
+                                    <option value="Semester 2">Semester 2</option>
+                                    <option value="Semester 3">Semester 3</option>
+                                    <option value="Semester 4">Semester 4</option>
+                                    <option value="Semester 5">Semester 5</option>
+                                    <option value="Semester 6">Semester 6</option>
+                                    <option value="Semester 7">Semester 7</option>
+                                    <option value="Semester 8">Semester 8</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Study Goal</label>
+                            <select id="group-study-goal" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                                <option value="Exam Prep">Exam Prep</option>
+                                <option value="Homework Help">Homework Help</option>
+                                <option value="Long-term Learning">Long-term Learning</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Availability</label>
+                            <select id="group-availability" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                                <option value="Morning (6AM-12PM)">Morning (6AM-12PM)</option>
+                                <option value="Afternoon (12PM-6PM)">Afternoon (12PM-6PM)</option>
+                                <option value="Evening (6PM-12AM)">Evening (6PM-12AM)</option>
+                                <option value="Night Owl (12AM-6AM)">Night Owl (12AM-6AM)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tags (comma separated)</label>
+                            <input type="text" id="group-tags" placeholder="e.g., Calculus, Pointers, OOP" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Max Members</label>
+                            <input type="number" id="group-max-members" min="2" max="20" value="10" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Create Group
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">Recommended Groups</h2>
+                        <button id="refresh-groups" class="text-blue-600 hover:underline font-medium">Refresh</button>
+                    </div>
+                    <div id="groups-container" class="space-y-4">
+                    </div>
+                    <div id="no-groups" class="hidden text-center py-12">
+                        <p class="text-slate-500">No groups found. Create one to get started!</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6">My Groups</h2>
+                    <div id="my-groups-container" class="space-y-4">
+                    </div>
+                    <div id="no-my-groups" class="text-center py-12">
+                        <p class="text-slate-500">You haven't joined any groups yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg hidden z-50"></div>
+
+    <script type="module">
+        import { authAPI } from './assets/js/api.js';
+        import { initSidebar } from './assets/js/sidebar.js';
+        initSidebar('groups');
+
+        // --- Role Guard ---
+        // This page is for STUDENTS only. Teachers see discussion-groups.html
+        const currentUser = authAPI.getCurrentUser();
+        if (!currentUser) {
+            window.location.href = 'student-login.html';
+        } else if (currentUser.role === 'teacher') {
+            window.location.href = 'discussion-groups.html';
+        }
+        // ------------------
+
+        const toast = document.getElementById('toast');
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        async function loadPreferences() {
+            try {
+                const user = authAPI.getCurrentUser();
+                if (user) {
+                    if (user.studyGoal) document.getElementById('study-goal').value = user.studyGoal;
+                    if (user.availability) document.getElementById('availability').value = user.availability;
+                    if (user.tags && user.tags.length) document.getElementById('tags-input').value = user.tags.join(', ');
+                    if (user.branch) document.getElementById('group-branch').value = user.branch;
+                    if (user.semester) document.getElementById('group-semester').value = user.semester;
+                }
+            } catch (err) {
+                console.error('Load preferences error:', err);
+            }
+        }
+
+        document.getElementById('preferences-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const tags = document.getElementById('tags-input').value.split(',').map(t => t.trim()).filter(Boolean);
+                const res = await authAPI.updateGroupPreferences({
+                    tags,
+                    studyGoal: document.getElementById('study-goal').value,
+                    availability: document.getElementById('availability').value
+                });
+                authAPI.setCurrentUser(res.user);
+                showToast('Preferences saved!');
+                await loadGroups();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        document.getElementById('create-group-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const tags = document.getElementById('group-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+                const groupData = {
+                    name: document.getElementById('group-name').value,
+                    description: document.getElementById('group-description').value,
+                    branch: document.getElementById('group-branch').value,
+                    semester: document.getElementById('group-semester').value,
+                    studyGoal: document.getElementById('group-study-goal').value,
+                    availability: document.getElementById('group-availability').value,
+                    tags,
+                    maxMembers: parseInt(document.getElementById('group-max-members').value)
+                };
+                console.log('Creating group with data:', groupData);
+                console.log('Current user:', authAPI.getCurrentUser());
+                await authAPI.createGroup(groupData);
+                showToast('Group created!');
+                document.getElementById('create-group-form').reset();
+                await loadGroups();
+                await loadMyGroups();
+            } catch (err) {
+                console.error('Create group error:', err);
+                showToast(err.message, 'error');
+            }
+        });
+
+        async function loadGroups() {
+            const container = document.getElementById('groups-container');
+            const noGroups = document.getElementById('no-groups');
+            try {
+                const res = await authAPI.discoverGroups();
+                // Frontend safety filter: students only see student-created study groups
+                const studentGroups = (res.groups || []).filter(g => g.creatorRole === 'student' || !g.creatorRole);
+                if (studentGroups.length === 0) {
+                    container.innerHTML = '';
+                    noGroups.classList.remove('hidden');
+                    return;
+                }
+                noGroups.classList.add('hidden');
+                container.innerHTML = studentGroups.map(group => `
+                    <div class="border border-slate-200 rounded-xl p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800">${group.name}</h3>
+                                ${group.description ? `<p class="text-slate-500 text-sm mt-1">${group.description}</p>` : ''}
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">${group.studyGoal}</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">${group.availability}</span>
+                                    ${group.tags.map(tag => `<span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">${tag}</span>`).join('')}
+                                </div>
+                                <div class="text-sm text-slate-500 mt-3">
+                                    ${group.memberCount}/${group.maxMembers} members • ${group.branch} • ${group.semester}
+                                    ${group.score > 0 ? `• <span class="text-green-600 font-medium">${group.score}% match</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                ${group.isMember ? `
+                                    <a href="group-chat.html?groupId=${group._id}" class="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                                        Enter Chat
+                                    </a>
+                                ` : ''}
+                                <button class="join-btn px-4 py-2 rounded-lg font-medium transition-colors ${
+                                    group.isMember 
+                                        ? 'bg-slate-200 text-slate-600 cursor-not-allowed' 
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }" data-group-id="${group._id}" ${group.isMember ? 'disabled' : ''}>
+                                    ${group.isMember ? 'Joined' : 'Join'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Load groups error:', err);
+            }
+        }
+
+        async function loadMyGroups() {
+            const container = document.getElementById('my-groups-container');
+            const noMyGroups = document.getElementById('no-my-groups');
+            try {
+                const res = await authAPI.getMyGroups();
+                // Frontend safety filter: only show student-created study groups
+                const studentGroups = (res.groups || []).filter(g => g.creatorRole === 'student' || !g.creatorRole);
+                if (studentGroups.length === 0) {
+                    container.innerHTML = '';
+                    noMyGroups.classList.remove('hidden');
+                    return;
+                }
+                noMyGroups.classList.add('hidden');
+                container.innerHTML = studentGroups.map(group => `
+                    <div class="border border-slate-200 rounded-xl p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800">${group.name}</h3>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">${group.studyGoal}</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">${group.availability}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="group-chat.html?groupId=${group._id}" class="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                                    Enter Chat
+                                </a>
+                                <button class="leave-btn px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors" data-group-id="${group._id}">
+                                    Leave
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Load my groups error:', err);
+            }
+        }
+
+        document.getElementById('groups-container').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('join-btn') && !e.target.disabled) {
+                const groupId = e.target.dataset.groupId;
+                try {
+                    await authAPI.joinGroup(groupId);
+                    showToast('Joined group!');
+                    await loadGroups();
+                    await loadMyGroups();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            }
+        });
+
+        document.getElementById('my-groups-container').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('leave-btn')) {
+                const groupId = e.target.dataset.groupId;
+                try {
+                    await authAPI.leaveGroup(groupId);
+                    showToast('Left group');
+                    await loadGroups();
+                    await loadMyGroups();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            }
+        });
+
+        document.getElementById('refresh-groups').addEventListener('click', async () => {
+            await loadGroups();
+            showToast('Groups refreshed');
+        });
+
+        (async () => {
+            try {
+                const user = await authAPI.getProfile();
+                console.log('Loaded profile from server:', user);
+            } catch (err) {
+                console.error('Error loading profile:', err);
+            }
+            await loadPreferences();
+            await loadGroups();
+            await loadMyGroups();
+        })();
+    </script>
+
+</div>
+</body>
+</html>

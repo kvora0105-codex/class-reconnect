@@ -1,0 +1,236 @@
+{
+  "snapshots": [
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxs8qc7osddas",
+      "title": "Conversation 2",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        },
+        {
+          "role": "ai",
+          "content": "Big O notation describes the upper bound of time/space growth with input size n, focusing on asymptotic behavior and ignoring constant factors.\n\nCommon classes: O(1) constant, O(log n) logarithmic (binary search), O(n) linear (single pass), O(n log n) (efficient sorts like merge/quick on average), O(n^2) quadratic (nested loops), O(2^n)/O(n!) exponential/factorial (brute force on combinatorial problems).\n\nIt helps compare scalability. Example: for n=1,000,000, O(n log n) sorting is far faster than O(n^2). Always consider average vs worst case and memory usage alongside runtime."
+        }
+      ],
+      "event": "delete",
+      "timestamp": "2025-11-13T19:11:49.628Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [],
+      "event": "create",
+      "timestamp": "2025-11-13T19:11:55.717Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:11:55.746Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        },
+        {
+          "role": "ai",
+          "content": "Binary Search Tree (BST): for every node, values in the left subtree are less and values in the right subtree are greater than the node.\n\nOperations: search, insert, delete typically follow comparisons down the tree, average O(log n) in balanced trees but O(n) in the worst case when the tree degenerates.\n\nBalancing: self-balancing variants (AVL, Red-Black) maintain height ~O(log n) to guarantee performance. Traversals: in-order yields sorted order; pre-order/post-order useful for serialization and subtree processing."
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:11:56.040Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        },
+        {
+          "role": "ai",
+          "content": "Binary Search Tree (BST): for every node, values in the left subtree are less and values in the right subtree are greater than the node.\n\nOperations: search, insert, delete typically follow comparisons down the tree, average O(log n) in balanced trees but O(n) in the worst case when the tree degenerates.\n\nBalancing: self-balancing variants (AVL, Red-Black) maintain height ~O(log n) to guarantee performance. Traversals: in-order yields sorted order; pre-order/post-order useful for serialization and subtree processing."
+        },
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:11:57.809Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        },
+        {
+          "role": "ai",
+          "content": "Binary Search Tree (BST): for every node, values in the left subtree are less and values in the right subtree are greater than the node.\n\nOperations: search, insert, delete typically follow comparisons down the tree, average O(log n) in balanced trees but O(n) in the worst case when the tree degenerates.\n\nBalancing: self-balancing variants (AVL, Red-Black) maintain height ~O(log n) to guarantee performance. Traversals: in-order yields sorted order; pre-order/post-order useful for serialization and subtree processing."
+        },
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        },
+        {
+          "role": "ai",
+          "content": "Big O notation describes the upper bound of time/space growth with input size n, focusing on asymptotic behavior and ignoring constant factors.\n\nCommon classes: O(1) constant, O(log n) logarithmic (binary search), O(n) linear (single pass), O(n log n) (efficient sorts like merge/quick on average), O(n^2) quadratic (nested loops), O(2^n)/O(n!) exponential/factorial (brute force on combinatorial problems).\n\nIt helps compare scalability. Example: for n=1,000,000, O(n log n) sorting is far faster than O(n^2). Always consider average vs worst case and memory usage alongside runtime."
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:11:58.124Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:16:31.113Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        },
+        {
+          "role": "ai",
+          "content": "Binary Search Tree (BST): for every node, values in the left subtree are less and values in the right subtree are greater than the node.\n\nOperations: search, insert, delete typically follow comparisons down the tree, average O(log n) in balanced trees but O(n) in the worst case when the tree degenerates.\n\nBalancing: self-balancing variants (AVL, Red-Black) maintain height ~O(log n) to guarantee performance. Traversals: in-order yields sorted order; pre-order/post-order useful for serialization and subtree processing."
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:16:31.421Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt2cmkldhhg7",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "How does a binary search tree work?"
+        },
+        {
+          "role": "ai",
+          "content": "Binary Search Tree (BST): for every node, values in the left subtree are less and values in the right subtree are greater than the node.\n\nOperations: search, insert, delete typically follow comparisons down the tree, average O(log n) in balanced trees but O(n) in the worst case when the tree degenerates.\n\nBalancing: self-balancing variants (AVL, Red-Black) maintain height ~O(log n) to guarantee performance. Traversals: in-order yields sorted order; pre-order/post-order useful for serialization and subtree processing."
+        }
+      ],
+      "event": "delete",
+      "timestamp": "2025-11-13T19:17:25.687Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt9hz1l3lwhc",
+      "title": "Conversation 1",
+      "messages": [],
+      "event": "create",
+      "timestamp": "2025-11-13T19:17:35.021Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt9hz1l3lwhc",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:17:35.050Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt9hz1l3lwhc",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        },
+        {
+          "role": "ai",
+          "content": "Big O notation describes the upper bound of time/space growth with input size n, focusing on asymptotic behavior and ignoring constant factors.\n\nCommon classes: O(1) constant, O(log n) logarithmic (binary search), O(n) linear (single pass), O(n log n) (efficient sorts like merge/quick on average), O(n^2) quadratic (nested loops), O(2^n)/O(n!) exponential/factorial (brute force on combinatorial problems).\n\nIt helps compare scalability. Example: for n=1,000,000, O(n log n) sorting is far faster than O(n^2). Always consider average vs worst case and memory usage alongside runtime."
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:17:35.342Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt9hz1l3lwhc",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        },
+        {
+          "role": "ai",
+          "content": "Big O notation describes the upper bound of time/space growth with input size n, focusing on asymptotic behavior and ignoring constant factors.\n\nCommon classes: O(1) constant, O(log n) logarithmic (binary search), O(n) linear (single pass), O(n log n) (efficient sorts like merge/quick on average), O(n^2) quadratic (nested loops), O(2^n)/O(n!) exponential/factorial (brute force on combinatorial problems).\n\nIt helps compare scalability. Example: for n=1,000,000, O(n log n) sorting is far faster than O(n^2). Always consider average vs worst case and memory usage alongside runtime."
+        },
+        {
+          "role": "user",
+          "content": "Explain object-oriented programming principles"
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:19:40.932Z"
+    },
+    {
+      "userId": "68edd7e677b6ee862a9373ef",
+      "id": "c_mhxt9hz1l3lwhc",
+      "title": "Conversation 1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain the concept of Big O notation"
+        },
+        {
+          "role": "ai",
+          "content": "Big O notation describes the upper bound of time/space growth with input size n, focusing on asymptotic behavior and ignoring constant factors.\n\nCommon classes: O(1) constant, O(log n) logarithmic (binary search), O(n) linear (single pass), O(n log n) (efficient sorts like merge/quick on average), O(n^2) quadratic (nested loops), O(2^n)/O(n!) exponential/factorial (brute force on combinatorial problems).\n\nIt helps compare scalability. Example: for n=1,000,000, O(n log n) sorting is far faster than O(n^2). Always consider average vs worst case and memory usage alongside runtime."
+        },
+        {
+          "role": "user",
+          "content": "Explain object-oriented programming principles"
+        },
+        {
+          "role": "ai",
+          "content": "Core OOP principles:\n\nEncapsulation: keep data and methods together and control access via class interfaces (private/protected/public). This reduces coupling and protects invariants.\n\nAbstraction: model complex systems with simplified interfaces, hiding implementation details. Focus on “what” not “how”, enabling easier reasoning and substitution.\n\nInheritance: create specialized types from existing ones (is-a relationship) to reuse behavior. Use carefully to avoid tight coupling (fragile base class); prefer composition when inheritance does not reflect a strict is-a.\n\nPolymorphism: same interface, different implementations (method overriding/virtual dispatch). Enables writing code against abstractions and swapping implementations without changing callers."
+        }
+      ],
+      "event": "update",
+      "timestamp": "2025-11-13T19:19:41.290Z"
+    }
+  ]
+}

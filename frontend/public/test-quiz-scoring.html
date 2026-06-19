@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quiz Scoring</title>
+</head>
+<body>
+    <h1>Quiz Scoring Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // Mock localStorage
+        const localStorage = {
+            data: {},
+            getItem: function(key) {
+                return this.data[key] || null;
+            },
+            setItem: function(key, value) {
+                this.data[key] = value;
+            }
+        };
+        
+        // Mock getCurrentUser function
+        function getCurrentUser() {
+            return {
+                id: 'test-user-123',
+                name: 'Test User',
+                role: 'student'
+            };
+        }
+        
+        // Copy the saveQuizResult function from index.html
+        function saveQuizResult(quizId, score, totalQuestions, answers) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                console.error('No user logged in - cannot save quiz result');
+                return;
+            }
+            
+            const result = {
+                quizId: quizId,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                score: score,
+                totalQuestions: totalQuestions,
+                percentage: Math.round((score / totalQuestions) * 100),
+                answers: answers,
+                completedAt: new Date().toISOString(),
+                id: Date.now() // Unique ID for this attempt
+            };
+            
+            // Get existing results or initialize empty array
+            let quizResults = JSON.parse(localStorage.getItem('quizResults')) || [];
+            
+            // Add new result
+            quizResults.push(result);
+            
+            // Keep only last 50 results per user to prevent storage bloat
+            const userResults = quizResults.filter(r => r.userId === currentUser.id);
+            if (userResults.length > 50) {
+                const userResultIds = userResults
+                    .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+                    .slice(0, 50)
+                    .map(r => r.id);
+                
+                quizResults = quizResults.filter(r => 
+                    r.userId !== currentUser.id || userResultIds.includes(r.id)
+                );
+            }
+            
+            // Save back to localStorage
+            localStorage.setItem('quizResults', JSON.stringify(quizResults));
+            
+            return result;
+        }
+        
+        function getQuizResults(userId = null) {
+            const quizResults = JSON.parse(localStorage.getItem('quizResults')) || [];
+            
+            if (userId) {
+                return quizResults.filter(result => result.userId === userId);
+            }
+            
+            return quizResults;
+        }
+        
+        // Test the quiz scoring functionality
+        function runTests() {
+            const testResults = document.getElementById('test-results');
+            let results = [];
+            
+            // Test 1: Save a quiz result
+            const testAnswers = [
+                {
+                    questionIndex: 0,
+                    question: "What is 2+2?",
+                    userAnswer: "0",
+                    correctAnswer: "0",
+                    isCorrect: true
+                },
+                {
+                    questionIndex: 1,
+                    question: "What is 3+3?",
+                    userAnswer: "1",
+                    correctAnswer: "2",
+                    isCorrect: false
+                }
+            ];
+            
+            const result1 = saveQuizResult('quiz-123', 1, 2, testAnswers);
+            results.push(`Test 1 - Save Quiz Result: ${result1 ? 'PASSED' : 'FAILED'}`);
+            
+            // Test 2: Retrieve quiz results
+            const allResults = getQuizResults();
+            results.push(`Test 2 - Retrieve Results: ${allResults.length > 0 ? 'PASSED' : 'FAILED'}`);
+            
+            // Test 3: Check result structure
+            const firstResult = allResults[0];
+            const hasCorrectStructure = firstResult && 
+                firstResult.quizId && 
+                firstResult.userId && 
+                firstResult.score !== undefined && 
+                firstResult.percentage !== undefined;
+            results.push(`Test 3 - Result Structure: ${hasCorrectStructure ? 'PASSED' : 'FAILED'}`);
+            
+            // Test 4: Check percentage calculation
+            const correctPercentage = Math.round((1 / 2) * 100) === 50;
+            results.push(`Test 4 - Percentage Calculation: ${firstResult.percentage === 50 ? 'PASSED' : 'FAILED'}`);
+            
+            // Display results
+            testResults.innerHTML = `
+                <h2>Test Results:</h2>
+                <ul>
+                    ${results.map(result => `<li>${result}</li>`).join('')}
+                </ul>
+                <h3>Sample Saved Result:</h3>
+                <pre>${JSON.stringify(firstResult, null, 2)}</pre>
+            `;
+        }
+        
+        // Run tests when page loads
+        window.onload = runTests;
+    </script>
+</body>
+</html>
