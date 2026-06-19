@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClassReconnect Dashboard</title>
     <script>
-        // Redirect to landing page if accessed directly via root URL
+        // Redirect to landing page only when accessed at the bare root URL (no explicit path)
         if (window.location.href === 'http://localhost:3000/' || 
-            window.location.href === 'http://localhost:3000' ||
-            window.location.href === 'http://localhost:3000/index.html') {
+            window.location.href === 'http://localhost:3000') {
             window.location.href = '/landing.html';
         }
     </script>
@@ -33,9 +32,30 @@
             background: #4a5568;
             border-radius: 2px;
         }
-        .quiz-option:hover {
-            background-color: #f0f4ff;
+        /* Sidebar nav links */
+        .cr-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            margin-bottom: 2px;
         }
+        .cr-nav-link:hover {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        .cr-nav-link.active {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+        .cr-nav-link svg { flex-shrink: 0; opacity: 0.85; }
+        .cr-nav-link.active svg { opacity: 1; }
         .quiz-option input:checked + label {
             border-color: #3b82f6;
             background-color: #dbeafe;
@@ -46,76 +66,7 @@
 <body class="bg-slate-100">
 
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col fixed h-full sidebar-scroll overflow-y-auto z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-            <!-- Logo -->
-            <div class="flex items-center justify-between p-4 border-b border-slate-700">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 h-8 w-8 mr-2"><path d="M12 22h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h2"></path><path d="M10 18a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"></path><path d="M2 6h4"></path><path d="M2 10h4"></path><path d="M2 14h4"></path></svg>
-                    <h1 class="text-xl font-bold">ClassReconnect</h1>
-                </div>
-                <button id="sidebar-close" class="lg:hidden p-1 text-slate-400 hover:text-white">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
 
-            <!-- Navigation -->
-            <nav id="main-nav" class="flex-1 px-4 py-4 space-y-2">
-                <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Navigation</p>
-                <a href="#dashboard" class="flex items-center px-4 py-2 text-sm font-medium bg-slate-700 text-blue-300 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
-                    Dashboard
-                </a>
-                <a href="#library" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    Library
-                </a>
-                <a href="qa.html" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3">
-                        <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"></path>
-                    </svg>
-                    AI Assistant
-                </a>
-                <a href="#qa" id="qa-nav-link" class="hidden flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    Q&A
-                </a>
-                <a href="#courses" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M12 2v20"></path><path d="M2 12h20"></path></svg>
-                    Courses
-                </a>
-                <a href="#quizzes" id="quizzes-nav-link" class="hidden flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M12 2l-8 10h16l-8-10z"></path><path d="M12 12v8"></path></svg>
-                    Quizzes
-                </a>
-                <a href="#student-quizzes" id="student-quizzes-nav-link" class="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M12 2l-8 10h16l-8-10z"></path><path d="M12 12v8"></path></svg>
-                    Quizzes
-                </a>
-                <a href="#contribute" id="contribute-nav-link" class="hidden flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-3"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-                    Contribute Notes
-                </a>
-            </nav>
-
-            <!-- Profile Footer -->
-            <div class="p-4 mt-auto border-t border-slate-700">
-                <div class="flex items-center">
-                    <a href="#profile" class="inline-block">
-                        <img id="profile-avatar" class="h-10 w-10 rounded-full cursor-pointer" src="https://placehold.co/100x100/7c3aed/ffffff?text=SU" alt="User Avatar">
-                    </a>
-                    <div class="ml-3">
-                        <p id="profile-name" class="text-sm font-medium text-white">Student User</p>
-                        <p id="profile-details" class="text-xs text-slate-400">COMPS • Semester 5</p>
-                    </div>
-                    <button class="ml-auto text-slate-400 hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
-                    </button>
-                </div>
-                
-                <button id="logout-button" class="w-full text-center mt-2 bg-slate-700 text-sm text-slate-200 py-2 rounded-lg hover:bg-slate-600 transition-colors">Logout</button>
-            </div>
-        </aside>
 
         <!-- Main Content -->
         <main class="lg:ml-64 flex-1 p-4 sm:p-6 lg:p-8">
@@ -164,13 +115,24 @@
                                 </div>
                             </div>
 
-                            <!-- Recent Resources Used -->
-                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                            <!-- Recent Resources Used (Students only) -->
+                            <div id="recent-resources-section" class="bg-white p-6 rounded-xl shadow-sm">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-lg font-bold text-slate-800">Recent Resources Used</h3>
                                 </div>
                                 <div id="recent-resources-container" class="space-y-4">
                                      <p class="text-slate-500">No resources viewed recently. Go to the library to start exploring!</p>
+                                </div>
+                            </div>
+
+                            <!-- Recent Discussion Groups (Teachers only) -->
+                            <div id="recent-discussion-groups-section" class="hidden bg-white p-6 rounded-xl shadow-sm">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-bold text-slate-800">Recent Discussion Groups</h3>
+                                    <a href="discussion-groups.html" class="text-sm text-green-600 hover:underline font-medium">View All →</a>
+                                </div>
+                                <div id="recent-discussion-groups-container" class="space-y-3">
+                                    <p class="text-slate-500">No discussion groups yet. <a href="discussion-groups.html" class="text-green-600 hover:underline">Create one</a> to get started!</p>
                                 </div>
                             </div>
                         </div>
@@ -832,6 +794,9 @@
 
     <script type="module">
         import { checkApiHealth } from './assets/js/api.js';
+        import { initSidebar, updateSidebarActive } from './assets/js/sidebar.js';
+        
+        initSidebar('dashboard');
         
         document.addEventListener('DOMContentLoaded', async function () {
             // Check API health on startup
@@ -930,6 +895,19 @@
                     if (studentQuizzesNavLink) {
                         studentQuizzesNavLink.classList.add('hidden');
                     }
+
+                    // Hide Study Groups; show Discussion Groups for teachers
+                    const studyGroupsNavLink = document.getElementById('study-groups-nav-link');
+                    if (studyGroupsNavLink) studyGroupsNavLink.classList.add('hidden');
+                    const discussionGroupsNavLink = document.getElementById('discussion-groups-nav-link');
+                    if (discussionGroupsNavLink) discussionGroupsNavLink.classList.remove('hidden');
+
+                    // Swap recents: hide resource recents, show discussion group recents
+                    const recentResourcesSection = document.getElementById('recent-resources-section');
+                    if (recentResourcesSection) recentResourcesSection.classList.add('hidden');
+                    const recentDiscussionSection = document.getElementById('recent-discussion-groups-section');
+                    if (recentDiscussionSection) recentDiscussionSection.classList.remove('hidden');
+                    loadRecentDiscussionGroups();
                     
                     // Show Quizzes stats for teachers (Q&A removed)
                 } else {
@@ -955,6 +933,18 @@
                     if (studentQuizzesNavLink) {
                         studentQuizzesNavLink.classList.remove('hidden');
                     }
+
+                    // Show Study Groups; hide Discussion Groups for students
+                    const studyGroupsNavLink = document.getElementById('study-groups-nav-link');
+                    if (studyGroupsNavLink) studyGroupsNavLink.classList.remove('hidden');
+                    const discussionGroupsNavLink = document.getElementById('discussion-groups-nav-link');
+                    if (discussionGroupsNavLink) discussionGroupsNavLink.classList.add('hidden');
+
+                    // Swap recents: show resource recents, hide discussion group recents
+                    const recentResourcesSection = document.getElementById('recent-resources-section');
+                    if (recentResourcesSection) recentResourcesSection.classList.remove('hidden');
+                    const recentDiscussionSection = document.getElementById('recent-discussion-groups-section');
+                    if (recentDiscussionSection) recentDiscussionSection.classList.add('hidden');
                     
                     // Hide Quizzes stats for students
                 }
@@ -1008,36 +998,22 @@
             // Ensure dashboard counters reflect latest user and quizzes state on login
             try { updateDashboardQuizCount(); } catch (_) {}
 
-            // Mobile sidebar toggle
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const sidebarClose = document.getElementById('sidebar-close');
-            const mainNav = document.getElementById('main-nav');
-
             function toggleMenu() {
-                sidebar.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
+                const btn = document.getElementById('cr-sidebar-toggle');
+                if (btn) btn.click();
             }
 
-            if (sidebarClose) {
-                sidebarClose.addEventListener('click', toggleMenu);
-            }
-            if (overlay) {
-                overlay.addEventListener('click', toggleMenu);
-            }
-
-            // --- Close sidebar on nav link click on mobile ---
-            if (mainNav) {
-                const navLinks = mainNav.querySelectorAll('a[href^="#"]');
-                navLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        // If the sidebar is open on a mobile screen, close it
-                        if (window.innerWidth < 1024 && !sidebar.classList.contains('-translate-x-full')) {
-                            toggleMenu();
-                        }
-                    });
-                });
-            }
+            // Close sidebar on nav link click on mobile
+            document.body.addEventListener('click', (e) => {
+                const link = e.target.closest('a.cr-nav-link');
+                if (link && window.innerWidth < 1024) {
+                    const sidebar = document.getElementById('cr-sidebar');
+                    if (sidebar && sidebar.dataset.open === '1') {
+                        const toggle = document.getElementById('cr-sidebar-toggle');
+                        if (toggle) toggle.click();
+                    }
+                }
+            });
 
             // --- Page Navigation Logic ---
             const contentSections = {
@@ -1213,18 +1189,7 @@
                 }
                 
                 // Update nav link styles
-                const navLinks = mainNav.querySelectorAll('a');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('href').startsWith('#')) {
-                        if (link.getAttribute('href') === hash) {
-                            link.classList.add('bg-slate-700', 'text-blue-300');
-                            link.classList.remove('text-slate-300', 'hover:bg-slate-700');
-                        } else {
-                            link.classList.remove('bg-slate-700', 'text-blue-300');
-                            link.classList.add('text-slate-300', 'hover:bg-slate-700');
-                        }
-                    }
-                });
+                updateSidebarActive(view);
             }
 
             // Listen for hash changes (e.g., back/forward buttons)
@@ -1235,273 +1200,9 @@
             hydrateUserUI();
 
             // --- Library Data and Filtering Logic ---
-            const resources = [
-                {
-                    title: 'DBMS Assignment 1',
-                    subject: 'DBMS',
-                    semester: 'Semester 3',
-                    type: 'Assignments',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 12',
-                    link: '/resources/DBMS/DBMS_Assignment_1.pdf'
-                },
-                 {
-                    title: 'DBMS Module 1: Introduction',
-                    subject: 'DBMS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DBMS/DBMS_Module_1.pdf'
-                },
-                {
-                    title: 'DBMS Module 2: Entity-Relationship Model',
-                    subject: 'DBMS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DBMS/DBMS_Module_2.pdf'
-                },
-                {
-                    title: 'DBMS Module 3: Relational Model & Algebra',
-                    subject: 'DBMS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DBMS/DBMS_Module_3.pdf'
-                },
-                {
-                    title: 'DBMS Module 4: Structured Query Language (SQL)',
-                    subject: 'DBMS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    links: [
-                        { label: 'View 1', url: '/resources/DBMS/DBMS_Module_4_one.pdf' },
-                        { label: 'View 2', url: '/resources/DBMS/DBMS_Module_4_two.pdf' }
-                    ]
-                },
-                {
-                    title: 'DBMS Module 5: Relational-Database Design',
-                    subject: 'DBMS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DBMS/DBMS_Module_5.pdf'
-                },
-                {
-                    title: 'DLCOA Module 1: Computer Fundamentals',
-                    subject: 'DLCOA',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DLCOA/Notes/Module_1.pdf'
-                },
-                 {
-                    title: 'DLCOA Module 2: Data Representation',
-                    subject: 'DLCOA',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DLCOA/Notes/Module_2.pdf'
-                },
-                {
-                    title: 'DLCOA Module 3: Processor Organization & Architecture',
-                    subject: 'DLCOA',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DLCOA/Notes/Module_3.pdf'
-                },
-                {
-                    title: 'Data Structure Module 1: Introduction',
-                    subject: 'Data Structures',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DS/Module_1.pdf'
-                },
-                {
-                    title: 'Data Structure Module 2: Stacks and Queues',
-                    subject: 'Data Structures',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DS/Module_2.pdf'
-                },
-                {
-                    title: 'Data Structure Module 3: Linked Lists',
-                    subject: 'Data Structures',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DS/Module_3.pdf'
-                },
-                {
-                    title: 'Data Structure Module 4: Trees',
-                    subject: 'Data Structures',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DS/Module_4.pdf'
-                },
-                {
-                    title: 'Data Structure Module 5: Graphs',
-                    subject: 'Data Structures',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DS/Module_5.pdf'
-                },
-                {
-                    title: 'Data Structure Module 6: Searching Techniques',
-                    subject: 'Data Structures',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DS/Module_6.pdf'
-                },
-                {
-                    title: 'Maths Module 1: Laplace Transformation',
-                    subject: 'MATHS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/Maths/Module_1.pdf'
-                },
-                {
-                    title: 'Maths Module 2: Inverse Laplace Transform',
-                    subject: 'MATHS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/Maths/Module_2.pdf'
-                },
-                {
-                    title: 'Maths Module 3: Fourier Series & Fourier Transform',
-                    subject: 'MATHS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/Maths/Module_3.pdf'
-                },
-                {
-                    title: 'Maths Module 4: Complex Variables',
-                    subject: 'MATHS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/Maths/Module_4.pdf'
-                },
-                 {
-                    title: 'Maths Module 5: Statistical Techniques',
-                    subject: 'MATHS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/Maths/Module_5.pdf'
-                },
-                {
-                    title: 'Maths Module 6: Probability',
-                    subject: 'MATHS',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/Maths/Module_6.pdf'
-                },
-                {
-                    title: 'DSGT Module 1: Logic and Proofs',
-                    subject: 'DSGT',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DSGT/Module_1.pdf'
-                },
-                {
-                    title: 'DSGT Module 2: Relations & Functions',
-                    subject: 'DSGT',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DSGT/Module_2.pdf'
-                },
-                {
-                    title: 'DSGT Module 3: Posets and Lattice',
-                    subject: 'DSGT',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DSGT/Module_3.pdf'
-                },
-                {
-                    title: 'DSGT Module 4: Counting',
-                    subject: 'DSGT',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DSGT/Module_4.pdf'
-                },
-                 {
-                    title: 'DSGT Module 6: Graph Theory',
-                    subject: 'DSGT',
-                    semester: 'Semester 3',
-                    type: 'Notes',
-                    branch: 'COMPS',
-                    downloads: 0,
-                    date: 'Oct 11',
-                    link: '/resources/DSGT/Module_6.pdf'
-                },
-            ];
+            const resources = [];
 
-            window.resources = resources;
+                        window.resources = resources;
             const staticLinksByTitle = {};
             resources.forEach(r => {
                 const l = r.link || (Array.isArray(r.links) && r.links.length > 0 ? r.links[0].url : null);
@@ -1605,7 +1306,41 @@
                      dashboardResourceCount.textContent = (window.resources || resources).length;
                  }
             }
-            
+
+            // Load and render recent discussion groups for teachers
+            async function loadRecentDiscussionGroups() {
+                const container = document.getElementById('recent-discussion-groups-container');
+                if (!container) return;
+                try {
+                    const { authAPI } = await import('./assets/js/api.js');
+                    const res = await authAPI.getMyGroups();
+                    const groups = (res.groups || []).slice(0, 3);
+                    if (groups.length === 0) {
+                        container.innerHTML = '<p class="text-slate-500">No discussion groups yet. <a href="discussion-groups.html" class="text-green-600 hover:underline">Create one</a> to get started!</p>';
+                        return;
+                    }
+                    container.innerHTML = groups.map(group => `
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 hover:border-green-200 transition-colors">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="bg-green-100 text-green-600 p-2 rounded-lg flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-slate-800 text-sm truncate">${group.name}</p>
+                                    <p class="text-xs text-slate-500">${group.branch} • ${group.semester} • ${group.memberCount}/${group.maxMembers} members</p>
+                                </div>
+                            </div>
+                            <a href="group-chat.html?groupId=${group._id}" class="flex-shrink-0 ml-3 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                                Open Chat
+                            </a>
+                        </div>
+                    `).join('');
+                } catch (err) {
+                    console.error('Failed to load recent discussion groups:', err);
+                    container.innerHTML = '<p class="text-slate-500 text-sm">Could not load discussion groups.</p>';
+                }
+            }
+
             function renderRecentResources() {
                 if (!recentResourcesContainer) return;
                 if (recentlyUsed.length === 0) {
@@ -2381,7 +2116,8 @@
                     // Extract filename from path (handles both Windows and Unix paths)
                     const filename = resource.filePath.split(/[\\/]/).pop();
                     
-                    const defaultUploadsLink = `http://localhost:3000/uploads/${filename}`;
+                    // Use relative path — backend serves /uploads/* on the same origin as the frontend
+                    const defaultUploadsLink = `/uploads/${filename}`;
                     const fallbackStaticLink = staticLinksByTitle[resource.title] || null;
                     const transformed = {
                         title: resource.title,

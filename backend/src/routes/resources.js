@@ -145,6 +145,7 @@ router.get('/deleted-defaults', async (_req, res) => {
     }
 });
 
+
 // Delete resource (by any teacher)
 router.delete('/:id', authenticateToken, async (req, res) => {
     try {

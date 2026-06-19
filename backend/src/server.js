@@ -16,6 +16,11 @@ import DeletedDefault from './models/DeletedDefault.js';
 import sampleResources from './data/sampleResources.js';
 import LoginActivity from './models/LoginActivity.js';
 import ProfileChangeLog from './models/ProfileChangeLog.js';
+import StudyGroup from './models/StudyGroup.js';
+import GroupMember from './models/GroupMember.js';
+import GroupMessage from './models/GroupMessage.js';
+import multer from 'multer';
+import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -54,6 +59,21 @@ if (!existsSync(uploadsPath)) {
     mkdirSync(uploadsPath, { recursive: true });
 }
 app.use('/uploads', express.static(uploadsPath));
+
+// Multer config for chat uploads
+const chatStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsPath);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const chatUpload = multer({ 
+    storage: chatStorage,
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+});
 
 // Serve landing page as default route (needs to be before API routes)
 app.get('/', (req, res) => {
@@ -459,6 +479,264 @@ app.post('/api/deleted-conversations', authenticateToken, async (req, res) => {
     } catch (e) {
         console.error('Create deleted conversation error:', e);
         res.status(500).json({ error: 'Server error creating deleted conversation' });
+    }
+});
+
+// Smart Group Discovery API Endpoints
+
+// Create a new study/discussion group
+app.post('/api/groups', authenticateToken, async (req, res) => {
+    try {
+        const { name, description, tags, studyGoal, availability, maxMembers, branch, semester } = req.body;
+        const userId = req.user.userId;
+        const creatorRole = req.user.role; // 'student' or 'teacher'
+
+        if (!name || !studyGoal || !availability || !branch || !semester) {
+            return res.status(400).json({ error: 'Required fields missing' });
+        }
+
+        const group = new StudyGroup({
+            name,
+            description,
+            tags: tags || [],
+            studyGoal,
+            availability,
+            maxMembers: maxMembers || 10,
+            createdBy: userId,
+            creatorRole,
+            branch,
+            semester
+        });
+
+        await group.save();
+
+        await GroupMember.create({
+            groupId: group._id,
+            userId,
+            role: 'admin'
+        });
+
+        res.status(201).json({ message: 'Group created successfully', group });
+    } catch (error) {
+        console.error('Create group error:', error);
+        res.status(500).json({ error: 'Server error creating group' });
+    }
+});
+
+// Discover groups — students see student groups, teachers see teacher (discussion) groups
+app.get('/api/groups/discover', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const requesterRole = req.user.role; // 'student' or 'teacher'
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Filter ONLY by creatorRole — all student groups visible to all students
+        let query = { isActive: true, creatorRole: requesterRole };
+
+        const groups = await StudyGroup.find(query).sort({ createdAt: -1 }).lean();
+
+        const groupsWithMemberCount = await Promise.all(groups.map(async (group) => {
+            const memberCount = await GroupMember.countDocuments({ groupId: group._id });
+            const isMember = await GroupMember.exists({ groupId: group._id, userId });
+            return { ...group, memberCount, isMember: !!isMember };
+        }));
+
+        const scoredGroups = groupsWithMemberCount.map(group => {
+            let score = 0;
+            if (user.studyGoal && group.studyGoal === user.studyGoal) score += 30;
+            if (user.availability && group.availability === user.availability) score += 30;
+            if (user.tags && user.tags.length > 0 && group.tags && group.tags.length > 0) {
+                const tagMatches = user.tags.filter(tag => group.tags.includes(tag)).length;
+                score += tagMatches * 10;
+            }
+            return { ...group, score };
+        }).sort((a, b) => b.score - a.score);
+
+        res.json({ groups: scoredGroups });
+    } catch (error) {
+        console.error('Discover groups error:', error);
+        res.status(500).json({ error: 'Server error discovering groups' });
+    }
+});
+
+// Get a group's details
+app.get('/api/groups/:id', authenticateToken, async (req, res) => {
+    try {
+        const group = await StudyGroup.findById(req.params.id).lean();
+        if (!group) {
+            return res.status(404).json({ error: 'Group not found' });
+        }
+
+        const members = await GroupMember.find({ groupId: group._id }).populate('userId', 'firstName lastName email').lean();
+        const memberCount = members.length;
+        const isMember = members.some(m => String(m.userId._id) === String(req.user.userId));
+
+        res.json({ group, members, memberCount, isMember });
+    } catch (error) {
+        console.error('Get group details error:', error);
+        res.status(500).json({ error: 'Server error fetching group details' });
+    }
+});
+
+// Join a group
+app.post('/api/groups/:id/join', authenticateToken, async (req, res) => {
+    try {
+        const group = await StudyGroup.findById(req.params.id);
+        if (!group) {
+            return res.status(404).json({ error: 'Group not found' });
+        }
+
+        const memberCount = await GroupMember.countDocuments({ groupId: group._id });
+        if (memberCount >= group.maxMembers) {
+            return res.status(400).json({ error: 'Group is full' });
+        }
+
+        const existingMember = await GroupMember.exists({ groupId: group._id, userId: req.user.userId });
+        if (existingMember) {
+            return res.status(400).json({ error: 'Already a member of this group' });
+        }
+
+        await GroupMember.create({
+            groupId: group._id,
+            userId: req.user.userId,
+            role: 'member'
+        });
+
+        res.json({ message: 'Successfully joined group' });
+    } catch (error) {
+        console.error('Join group error:', error);
+        res.status(500).json({ error: 'Server error joining group' });
+    }
+});
+
+// Leave a group
+app.post('/api/groups/:id/leave', authenticateToken, async (req, res) => {
+    try {
+        const membership = await GroupMember.findOneAndDelete({
+            groupId: req.params.id,
+            userId: req.user.userId
+        });
+
+        if (!membership) {
+            return res.status(404).json({ error: 'Not a member of this group' });
+        }
+
+        res.json({ message: 'Successfully left group' });
+    } catch (error) {
+        console.error('Leave group error:', error);
+        res.status(500).json({ error: 'Server error leaving group' });
+    }
+});
+
+// Get groups user is a member of — filtered by creator role to match requester's role
+app.get('/api/my-groups', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const requesterRole = req.user.role;
+        const memberships = await GroupMember.find({ userId }).populate('groupId').lean();
+        // Filter out groups whose creatorRole doesn't match the requester's role
+        // Show all groups the user is a member of (role-isolation is handled at discover level)
+        const groups = memberships
+            .filter(m => m.groupId)
+            .map(async (m) => {
+                const memberCount = await GroupMember.countDocuments({ groupId: m.groupId._id });
+                return { ...m.groupId, role: m.role, memberCount };
+            });
+        const resolvedGroups = await Promise.all(groups);
+        res.json({ groups: resolvedGroups });
+    } catch (error) {
+        console.error('Get my groups error:', error);
+        res.status(500).json({ error: 'Server error fetching my groups' });
+    }
+});
+
+// Update user's group discovery preferences
+app.put('/api/user/group-preferences', authenticateToken, async (req, res) => {
+    try {
+        const { tags, studyGoal, availability } = req.body;
+        const updateData = {};
+        if (tags !== undefined) updateData.tags = tags;
+        if (studyGoal) updateData.studyGoal = studyGoal;
+        if (availability) updateData.availability = availability;
+
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ message: 'Preferences updated successfully', user: user.toJSON() });
+    } catch (error) {
+        console.error('Update group preferences error:', error);
+        res.status(500).json({ error: 'Server error updating preferences' });
+    }
+});
+
+// Group Chat API Endpoints
+app.get('/api/groups/:id/messages', authenticateToken, async (req, res) => {
+    try {
+        const groupId = req.params.id;
+        const isMember = await GroupMember.exists({ groupId, userId: req.user.userId });
+        if (!isMember) {
+            return res.status(403).json({ error: 'Not a member of this group' });
+        }
+        const messages = await GroupMessage.find({ groupId }).sort({ createdAt: 1 }).lean();
+        res.json({ messages });
+    } catch (error) {
+        console.error('Get group messages error:', error);
+        res.status(500).json({ error: 'Server error fetching messages' });
+    }
+});
+
+app.post('/api/groups/:id/messages', authenticateToken, chatUpload.single('file'), async (req, res) => {
+    try {
+        const groupId = req.params.id;
+        const userId = req.user.userId;
+        
+        const isMember = await GroupMember.exists({ groupId, userId });
+        if (!isMember) {
+            return res.status(403).json({ error: 'Not a member of this group' });
+        }
+
+        const user = await User.findById(userId);
+        const userName = `${user.firstName} ${user.lastName}`;
+
+        const messageData = {
+            groupId,
+            userId,
+            userName
+        };
+
+        if (req.body.message) {
+            messageData.message = req.body.message;
+        }
+
+        if (req.file) {
+            const fileUrl = `/uploads/${req.file.filename}`;
+            if (req.file.mimetype.startsWith('image/')) {
+                messageData.imageUrl = fileUrl;
+            } else {
+                messageData.fileUrl = fileUrl;
+                messageData.fileName = req.file.originalname;
+            }
+        }
+
+        if (!messageData.message && !messageData.imageUrl && !messageData.fileUrl) {
+            return res.status(400).json({ error: 'Message or file required' });
+        }
+
+        const message = await GroupMessage.create(messageData);
+        res.status(201).json({ message });
+    } catch (error) {
+        console.error('Send group message error:', error);
+        res.status(500).json({ error: 'Server error sending message' });
     }
 });
 

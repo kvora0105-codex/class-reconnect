@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion Groups • ClassReconnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 2px; }
+        .cr-nav-link { display: flex; align-items: center; gap: 14px; padding: 11px 16px; border-radius: 10px; font-size: 15px; font-weight: 500; color: #94a3b8; text-decoration: none; transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+        .cr-nav-link:hover { background: #1e293b; color: #e2e8f0; }
+        .cr-nav-link.active { background: #1e293b; color: #93c5fd; }
+        .cr-nav-link svg { flex-shrink: 0; opacity: 0.85; }
+        .cr-nav-link.active svg { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+
+<div class="lg:ml-64 flex-1 min-h-screen">
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Discussion Groups</h1>
+                <p class="text-slate-500 mt-2">Create and manage class discussion groups for your students</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Create Group Form -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">Create Discussion Group</h2>
+                    <form id="create-group-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Group Name *</label>
+                            <input type="text" id="group-name" required placeholder="e.g., Data Structures Discussion"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                            <textarea id="group-description" rows="2" placeholder="What will this group discuss?"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Branch *</label>
+                                <select id="group-branch" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500">
+                                    <option value="COMPS">COMPS</option>
+                                    <option value="IT">IT</option>
+                                    <option value="AIDS">AIDS</option>
+                                    <option value="EXTC">EXTC</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Semester *</label>
+                                <select id="group-semester" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500">
+                                    <option value="Semester 1">Semester 1</option>
+                                    <option value="Semester 2">Semester 2</option>
+                                    <option value="Semester 3">Semester 3</option>
+                                    <option value="Semester 4">Semester 4</option>
+                                    <option value="Semester 5">Semester 5</option>
+                                    <option value="Semester 6">Semester 6</option>
+                                    <option value="Semester 7">Semester 7</option>
+                                    <option value="Semester 8">Semester 8</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
+                            <select id="group-subject" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500">
+                                <option value="">General Discussion</option>
+                                <option value="Data Structures">Data Structures</option>
+                                <option value="DBMS">DBMS</option>
+                                <option value="DLCOA">DLCOA</option>
+                                <option value="DSGT">DSGT</option>
+                                <option value="MATHS">MATHS</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tags (comma separated)</label>
+                            <input type="text" id="group-tags" placeholder="e.g., Assignments, Doubts, Projects"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Max Members</label>
+                            <input type="number" id="group-max-members" min="2" max="100" value="30"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500">
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Create Discussion Group
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Teacher Info Card -->
+                <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+                    <div class="flex items-start gap-3">
+                        <div class="bg-green-100 text-green-600 p-2 rounded-lg mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-green-800 mb-1">Teacher Controls</h3>
+                            <p class="text-sm text-green-700">As the group creator, you can moderate discussions, post announcements, and share resources with your students.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Groups List -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- All Discussion Groups -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">All Discussion Groups</h2>
+                        <button id="refresh-groups" class="text-green-600 hover:underline font-medium">Refresh</button>
+                    </div>
+                    <div id="groups-container" class="space-y-4"></div>
+                    <div id="no-groups" class="hidden text-center py-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-slate-300 mb-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <p class="text-slate-500">No discussion groups yet. Create one to get started!</p>
+                    </div>
+                </div>
+
+                <!-- My Discussion Groups -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6">My Discussion Groups</h2>
+                    <div id="my-groups-container" class="space-y-4"></div>
+                    <div id="no-my-groups" class="text-center py-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-slate-300 mb-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <p class="text-slate-500">You haven't created any discussion groups yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg hidden z-50"></div>
+
+    <script type="module">
+        import { authAPI } from './assets/js/api.js';
+        import { initSidebar } from './assets/js/sidebar.js';
+        initSidebar('discussion-groups');
+
+        const toast = document.getElementById('toast');
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // --- Role Guard ---
+        // This page is for TEACHERS only. Students are sent to groups.html
+        const currentUser = authAPI.getCurrentUser();
+        if (!currentUser) {
+            window.location.href = 'teacher-login.html';
+        } else if (currentUser.role !== 'teacher') {
+            window.location.href = 'groups.html';
+        }
+        // ------------------
+
+        document.getElementById('create-group-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const tags = document.getElementById('group-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+                const subject = document.getElementById('group-subject').value;
+                const groupData = {
+                    name: document.getElementById('group-name').value,
+                    description: document.getElementById('group-description').value,
+                    branch: document.getElementById('group-branch').value,
+                    semester: document.getElementById('group-semester').value,
+                    studyGoal: subject ? `${subject} Discussion` : 'Class Discussion',
+                    availability: 'Anytime',
+                    tags: tags.length ? tags : ['Discussion'],
+                    maxMembers: parseInt(document.getElementById('group-max-members').value)
+                };
+                await authAPI.createGroup(groupData);
+                showToast('Discussion group created!');
+                document.getElementById('create-group-form').reset();
+                document.getElementById('group-max-members').value = 30;
+                await loadGroups();
+                await loadMyGroups();
+            } catch (err) {
+                console.error('Create group error:', err);
+                showToast(err.message, 'error');
+            }
+        });
+
+        async function loadGroups() {
+            const container = document.getElementById('groups-container');
+            const noGroups = document.getElementById('no-groups');
+            try {
+                const res = await authAPI.discoverGroups();
+                // Frontend safety filter: only show teacher-created discussion groups
+                const teacherGroups = (res.groups || []).filter(g => g.creatorRole === 'teacher');
+                if (teacherGroups.length === 0) {
+                    container.innerHTML = '';
+                    noGroups.classList.remove('hidden');
+                    return;
+                }
+                noGroups.classList.add('hidden');
+                container.innerHTML = teacherGroups.map(group => `
+                    <div class="border border-slate-200 rounded-xl p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-lg text-slate-800">${group.name}</h3>
+                                ${group.description ? `<p class="text-slate-500 text-sm mt-1">${group.description}</p>` : ''}
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">${group.studyGoal}</span>
+                                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">${group.branch} • ${group.semester}</span>
+                                    ${group.tags.map(tag => `<span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">${tag}</span>`).join('')}
+                                </div>
+                                <p class="text-sm text-slate-400 mt-2">${group.memberCount}/${group.maxMembers} members</p>
+                            </div>
+                            <div class="flex gap-2 ml-4 flex-shrink-0">
+                                ${group.isMember ? `
+                                    <a href="group-chat.html?groupId=${group._id}" class="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors text-sm">
+                                        Open Chat
+                                    </a>
+                                ` : `
+                                    <button class="join-btn px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm" data-group-id="${group._id}">
+                                        Join
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Load groups error:', err);
+                showToast('Failed to load groups', 'error');
+            }
+        }
+
+        async function loadMyGroups() {
+            const container = document.getElementById('my-groups-container');
+            const noMyGroups = document.getElementById('no-my-groups');
+            try {
+                const res = await authAPI.getMyGroups();
+                // Frontend safety filter: only show teacher-created discussion groups
+                const teacherGroups = (res.groups || []).filter(g => g.creatorRole === 'teacher');
+                if (teacherGroups.length === 0) {
+                    container.innerHTML = '';
+                    noMyGroups.classList.remove('hidden');
+                    return;
+                }
+                noMyGroups.classList.add('hidden');
+                container.innerHTML = teacherGroups.map(group => `
+                    <div class="border border-green-200 bg-green-50 rounded-xl p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-lg text-slate-800">${group.name}</h3>
+                                    <span class="px-2 py-0.5 bg-green-200 text-green-800 rounded-full text-xs font-semibold">Creator</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">${group.studyGoal}</span>
+                                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">${group.branch} • ${group.semester}</span>
+                                </div>
+                                <p class="text-sm text-slate-500 mt-2">${group.memberCount}/${group.maxMembers} members</p>
+                            </div>
+                            <div class="flex gap-2 ml-4 flex-shrink-0">
+                                <a href="group-chat.html?groupId=${group._id}" class="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors text-sm">
+                                    Open Chat
+                                </a>
+                                <button class="leave-btn px-4 py-2 bg-red-100 text-red-600 rounded-lg font-medium hover:bg-red-200 transition-colors text-sm" data-group-id="${group._id}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Load my groups error:', err);
+            }
+        }
+
+        document.getElementById('groups-container').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('join-btn')) {
+                const groupId = e.target.dataset.groupId;
+                try {
+                    await authAPI.joinGroup(groupId);
+                    showToast('Joined discussion group!');
+                    await loadGroups();
+                    await loadMyGroups();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            }
+        });
+
+        document.getElementById('my-groups-container').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('leave-btn')) {
+                const groupId = e.target.dataset.groupId;
+                if (!confirm('Are you sure you want to delete this discussion group?')) return;
+                try {
+                    await authAPI.leaveGroup(groupId);
+                    showToast('Group deleted');
+                    await loadGroups();
+                    await loadMyGroups();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            }
+        });
+
+        document.getElementById('refresh-groups').addEventListener('click', async () => {
+            await loadGroups();
+            showToast('Groups refreshed');
+        });
+
+        (async () => {
+            await loadGroups();
+            await loadMyGroups();
+        })();
+    </script>
+
+</div>
+</body>
+</html>

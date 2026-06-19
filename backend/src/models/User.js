@@ -67,6 +67,21 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: function() { return this.role === 'teacher'; }
+    },
+    // Smart Group Discovery fields
+    tags: [{
+        type: String,
+        trim: true
+    }],
+    studyGoal: {
+        type: String,
+        enum: ['Exam Prep', 'Homework Help', 'Long-term Learning'],
+        default: 'Exam Prep'
+    },
+    availability: {
+        type: String,
+        enum: ['Morning (6AM-12PM)', 'Afternoon (12PM-6PM)', 'Evening (6PM-12AM)', 'Night Owl (12AM-6AM)'],
+        default: 'Evening (6PM-12AM)'
     }
 }, {
     timestamps: true

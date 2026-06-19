@@ -1,5 +1,5 @@
 // API utility functions for authentication
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 // Helper function to get auth token
 function getAuthToken() {
@@ -190,6 +190,92 @@ export const authAPI = {
             body: JSON.stringify({ question })
         });
         return response;
+    },
+
+    // Smart Group Discovery functions
+    async createGroup(groupData) {
+        const response = await apiRequest('/groups', {
+            method: 'POST',
+            body: JSON.stringify(groupData)
+        });
+        return response;
+    },
+
+    async discoverGroups() {
+        const response = await apiRequest('/groups/discover');
+        return response;
+    },
+
+    async getGroup(groupId) {
+        const response = await apiRequest(`/groups/${groupId}`);
+        return response;
+    },
+
+    async joinGroup(groupId) {
+        const response = await apiRequest(`/groups/${groupId}/join`, {
+            method: 'POST'
+        });
+        return response;
+    },
+
+    async leaveGroup(groupId) {
+        const response = await apiRequest(`/groups/${groupId}/leave`, {
+            method: 'POST'
+        });
+        return response;
+    },
+
+    async getMyGroups() {
+        const response = await apiRequest('/my-groups');
+        return response;
+    },
+
+    async updateGroupPreferences(preferences) {
+        const response = await apiRequest('/user/group-preferences', {
+            method: 'PUT',
+            body: JSON.stringify(preferences)
+        });
+        return response;
+    },
+
+    // Group Chat functions
+    async getGroupMessages(groupId) {
+        const response = await apiRequest(`/groups/${groupId}/messages`);
+        return response;
+    },
+
+    async sendGroupMessage(groupId, formData) {
+        const url = `${API_BASE_URL}/groups/${groupId}/messages`;
+        const token = getAuthToken();
+        const headers = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const config = {
+            method: 'POST',
+            headers,
+            body: formData
+        };
+
+        const response = await fetch(url, config);
+        let data;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            data = await response.text();
+        }
+        
+        if (!response.ok) {
+            throw new Error(
+                typeof data === 'object' ? data.error || 'API request failed' :
+                `API request failed: ${response.status} ${response.statusText}`
+            );
+        }
+        
+        return data;
     }
 };
 

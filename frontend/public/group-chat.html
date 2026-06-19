@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat • ClassReconnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 2px; }
+        .cr-nav-link { display: flex; align-items: center; gap: 14px; padding: 11px 16px; border-radius: 10px; font-size: 15px; font-weight: 500; color: #94a3b8; text-decoration: none; transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+        .cr-nav-link:hover { background: #1e293b; color: #e2e8f0; }
+        .cr-nav-link.active { background: #1e293b; color: #93c5fd; }
+        .cr-nav-link svg { flex-shrink: 0; opacity: 0.85; }
+        .cr-nav-link.active svg { opacity: 1; }
+        .messages-area { height: calc(100vh - 140px); overflow-y: auto; }
+        .messages-area::-webkit-scrollbar { width: 4px; }
+        .messages-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        /* Info panel */
+        #info-panel {
+            position: fixed; top: 0; right: -360px; width: 360px; height: 100vh;
+            background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            transition: right 0.3s ease; z-index: 60; display: flex; flex-direction: column;
+        }
+        #info-panel.open { right: 0; }
+        #info-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 55;
+        }
+        #info-overlay.open { display: block; }
+
+        /* Tab underline */
+        .tab-btn { padding: 12px 0; font-size: 13px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; flex: 1; text-align: center; transition: all .15s; }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Member chip */
+        .member-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; }
+        .member-row:hover { background: #f8fafc; }
+        .avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0; }
+
+        /* Media grid */
+        .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+        .media-item { aspect-ratio: 1; background: #e2e8f0; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .media-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Doc/link row */
+        .file-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+        .file-row:hover { background: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<div class="lg:ml-64 flex flex-col" style="height:100vh;">
+
+
+    <!-- Chat area wrapper: flex row (chat + info panel for desktop) -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- ── MAIN CHAT COLUMN ───────────────────────────────────────── -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+
+            <!-- Chat header -->
+            <div class="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3" style="flex-shrink:0;">
+                <a href="groups.html" class="text-slate-500 hover:text-blue-600 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <!-- Group avatar -->
+                <div id="header-avatar" class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">G</div>
+                <!-- Group name — click to open info -->
+                <button id="open-info-btn" class="flex-1 text-left">
+                    <p id="group-title" class="font-semibold text-slate-800 text-base leading-tight hover:text-blue-600 transition-colors">Group Chat</p>
+                    <p id="member-count" class="text-xs text-slate-500 mt-0.5">Loading members...</p>
+                </button>
+                <!-- Info icon -->
+                <button id="open-info-btn2" class="text-slate-400 hover:text-blue-600 flex-shrink-0 p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div id="messages-container" class="messages-area p-4 space-y-2">
+                <p class="text-center text-slate-400 text-sm py-16">No messages yet. Start the conversation!</p>
+            </div>
+
+            <!-- Input bar -->
+            <div class="bg-white border-t border-slate-200 px-4 py-3" style="flex-shrink:0;">
+                <div id="file-preview" class="hidden flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-lg mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>
+                    <span id="file-name" class="text-xs text-slate-700 flex-1 truncate"></span>
+                    <button id="remove-file" class="text-red-500 hover:text-red-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                <form id="chat-form" class="flex items-center gap-3">
+                    <input type="file" id="chat-file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.txt" class="hidden">
+                    <button type="button" id="attach-file" class="text-slate-400 hover:text-blue-600 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    </button>
+                    <textarea id="chat-message" rows="1" placeholder="Type a message…"
+                        class="flex-1 px-4 py-2.5 bg-slate-100 rounded-full resize-none text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        style="max-height:120px;"></textarea>
+                    <button type="submit" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── GROUP INFO PANEL (slides from right) ──────────────────── -->
+<div id="info-overlay"></div>
+<div id="info-panel">
+    <!-- Panel header -->
+    <div class="flex items-center gap-3 px-4 py-4 border-b border-slate-100 flex-shrink-0" style="background:#2563eb;">
+        <button id="close-info" class="text-white/80 hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        <span class="text-white font-semibold text-base">Group Info</span>
+    </div>
+
+    <!-- Group banner -->
+    <div class="flex flex-col items-center py-6 px-4 border-b border-slate-100 flex-shrink-0" style="background: linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);">
+        <div id="panel-avatar" class="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-bold mb-3">G</div>
+        <p id="panel-name" class="text-lg font-bold text-slate-800 text-center"></p>
+        <p id="panel-desc" class="text-sm text-slate-500 mt-1 text-center"></p>
+        <span id="panel-members-badge" class="mt-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full"></span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-slate-100 flex-shrink-0">
+        <button class="tab-btn active" data-tab="members">Members</button>
+        <button class="tab-btn" data-tab="media">Media</button>
+        <button class="tab-btn" data-tab="docs">Docs</button>
+        <button class="tab-btn" data-tab="links">Links</button>
+    </div>
+
+    <!-- Tab contents -->
+    <div class="flex-1 overflow-y-auto">
+
+        <!-- Members tab -->
+        <div id="tab-members" class="tab-content active py-2">
+            <div id="members-list"><p class="text-center text-slate-400 text-sm py-8">Loading members…</p></div>
+        </div>
+
+        <!-- Media tab -->
+        <div id="tab-media" class="tab-content p-3">
+            <div id="media-grid" class="media-grid"></div>
+            <p id="no-media" class="text-center text-slate-400 text-sm py-8 hidden">No media shared yet</p>
+        </div>
+
+        <!-- Docs tab -->
+        <div id="tab-docs" class="tab-content">
+            <div id="docs-list"></div>
+            <p id="no-docs" class="text-center text-slate-400 text-sm py-8 hidden">No documents shared yet</p>
+        </div>
+
+        <!-- Links tab -->
+        <div id="tab-links" class="tab-content">
+            <div id="links-list"></div>
+            <p id="no-links" class="text-center text-slate-400 text-sm py-8 hidden">No links shared yet</p>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="fixed bottom-4 right-4 px-5 py-3 rounded-xl shadow-lg text-white text-sm hidden z-50"></div>
+
+<script type="module">
+    import { authAPI } from './assets/js/api.js';
+    import { initSidebar } from './assets/js/sidebar.js';
+    initSidebar('groups');
+
+    // ── Helpers ──────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const toast = $('toast');
+    function showToast(msg, type = 'success') {
+        toast.textContent = msg;
+        toast.className = `fixed bottom-4 right-4 px-5 py-3 rounded-xl shadow-lg text-white text-sm z-50 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+    function getParam(p) { return new URLSearchParams(window.location.search).get(p); }
+
+    const COLORS = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#65a30d'];
+    function colorFor(str) { let h = 0; for (let c of str) h = (h * 31 + c.charCodeAt(0)) % COLORS.length; return COLORS[h]; }
+    function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+
+    // ── State ─────────────────────────────────────────────────────
+    const groupId = getParam('groupId');
+    let selectedFile = null;
+    let groupData = null;
+    let groupMembers = [];
+    let allMessages = [];
+
+    // ── Load group info ────────────────────────────────────────────
+    async function loadGroupInfo() {
+        try {
+            const res = await authAPI.getGroup(groupId);
+            groupData = res.group;
+            groupMembers = res.members || [];   // members is top-level, NOT inside group
+            const memberCount = res.memberCount ?? groupMembers.length;
+            const name = groupData.name || 'Group';
+            const ic = initials(name);
+            const col = colorFor(name);
+
+            $('group-title').textContent = name;
+            $('header-avatar').textContent = ic;
+            $('header-avatar').style.background = col;
+            $('panel-avatar').textContent = ic;
+            $('panel-avatar').style.background = col;
+            $('panel-name').textContent = name;
+            $('panel-desc').textContent = groupData.studyGoal || groupData.description || '';
+
+            $('member-count').textContent = `${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+            $('panel-members-badge').textContent = `${memberCount} Members`;
+            renderMembers(groupMembers);
+        } catch (err) {
+            console.error(err);
+            showToast('Failed to load group info', 'error');
+        }
+    }
+
+    function renderMembers(members) {
+        if (!members || !members.length) {
+            $('members-list').innerHTML = '<p class="text-center text-slate-400 text-sm py-8">No members found</p>';
+            return;
+        }
+        $('members-list').innerHTML = members.map(m => {
+            // Each member record: { userId: { _id, firstName, lastName, email }, role, joinedAt }
+            const u = m.userId || m;   // handle both populated and flat shapes
+            const name = u.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : (u.name || u.email || 'Member');
+            const memberRole = u.role === 'teacher' ? 'Teacher' : (u.branch ? `${u.branch} • ${u.semester || ''}` : 'Student');
+            const col = colorFor(name);
+            const ic = initials(name);
+            const createdBy = groupData?.createdBy;
+            const userId = u._id || u.id;
+            const isCreator = createdBy && String(userId) === String(createdBy._id || createdBy);
+            return `
+            <div class="member-row">
+                <div class="avatar" style="background:${col};">${ic}</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">${name}${isCreator ? ' 👑' : ''}</p>
+                    <p class="text-xs text-slate-500 truncate">${memberRole}</p>
+                </div>
+                ${isCreator ? '<span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Admin</span>' : ''}
+            </div>`;
+        }).join('');
+    }
+
+    // ── Load messages ──────────────────────────────────────────────
+    async function loadMessages() {
+        try {
+            const res = await authAPI.getGroupMessages(groupId);
+            allMessages = res.messages || [];
+            renderMessages();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function renderMessages() {
+        const container = $('messages-container');
+        if (!allMessages.length) {
+            container.innerHTML = '<p class="text-center text-slate-400 text-sm py-16">No messages yet. Start the conversation!</p>';
+            return;
+        }
+        const me = authAPI.getCurrentUser();
+        container.innerHTML = allMessages.map(msg => {
+            const isMine = me && String(msg.userId) === String(me._id);
+            const col = colorFor(msg.userName || 'User');
+            const ic = initials(msg.userName || 'User');
+            return `
+            <div class="flex ${isMine ? 'justify-end' : 'justify-start'} items-end gap-2">
+                ${!isMine ? `<div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:${col};">${ic}</div>` : ''}
+                <div class="max-w-[72%]">
+                    ${!isMine ? `<p class="text-xs font-semibold mb-1" style="color:${col};">${msg.userName || 'Member'}</p>` : ''}
+                    <div class="${isMine ? 'bg-blue-600 text-white rounded-t-2xl rounded-bl-2xl' : 'bg-white text-slate-800 border border-slate-200 rounded-t-2xl rounded-br-2xl'} px-4 py-2.5 shadow-sm">
+                        ${msg.message ? `<p class="text-sm leading-relaxed">${msg.message}</p>` : ''}
+                        ${msg.imageUrl ? `<img src="${msg.imageUrl}" class="mt-1 max-w-full rounded-lg" alt="image">` : ''}
+                        ${msg.fileUrl ? `<a href="${msg.fileUrl}" target="_blank" class="mt-1 flex items-center gap-2 text-xs ${isMine ? 'text-blue-200 hover:text-white' : 'text-blue-600 hover:underline'}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>
+                            ${msg.fileName || 'File'}
+                        </a>` : ''}
+                    </div>
+                </div>
+                ${isMine ? `<div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:${col};">${ic}</div>` : ''}
+            </div>`;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // ── Populate Media / Docs / Links from messages ────────────────
+    function buildMediaDocsLinks() {
+        const images = allMessages.filter(m => m.imageUrl);
+        const docs   = allMessages.filter(m => m.fileUrl);
+        // Extract URLs from text
+        const urlRe = /https?:\/\/[^\s]+/g;
+        const links  = allMessages.filter(m => m.message && urlRe.test(m.message))
+                                  .flatMap(m => (m.message.match(urlRe)||[]).map(url => ({url, from: m.userName})));
+
+        // Media
+        const mediaGrid = $('media-grid');
+        if (images.length) {
+            mediaGrid.innerHTML = images.map(m => `
+                <div class="media-item cursor-pointer" onclick="window.open('${m.imageUrl}','_blank')">
+                    <img src="${m.imageUrl}" alt="media" loading="lazy">
+                </div>`).join('');
+            $('no-media').classList.add('hidden');
+        } else {
+            mediaGrid.innerHTML = '';
+            $('no-media').classList.remove('hidden');
+        }
+
+        // Docs
+        const docsList = $('docs-list');
+        if (docs.length) {
+            docsList.innerHTML = docs.map(m => `
+                <a href="${m.fileUrl}" target="_blank" class="file-row">
+                    <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-medium text-slate-800 truncate">${m.fileName || 'Document'}</p>
+                        <p class="text-xs text-slate-400">Shared by ${m.userName || 'Member'}</p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>`).join('');
+            $('no-docs').classList.add('hidden');
+        } else {
+            docsList.innerHTML = '';
+            $('no-docs').classList.remove('hidden');
+        }
+
+        // Links
+        const linksList = $('links-list');
+        if (links.length) {
+            linksList.innerHTML = links.map(l => `
+                <a href="${l.url}" target="_blank" class="file-row">
+                    <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-medium text-blue-600 truncate">${l.url}</p>
+                        <p class="text-xs text-slate-400">Shared by ${l.from || 'Member'}</p>
+                    </div>
+                </a>`).join('');
+            $('no-links').classList.add('hidden');
+        } else {
+            linksList.innerHTML = '';
+            $('no-links').classList.remove('hidden');
+        }
+    }
+
+    // ── Info panel open/close ──────────────────────────────────────
+    function openPanel() {
+        buildMediaDocsLinks();
+        // Re-render members with latest data
+        renderMembers(groupMembers);
+        $('info-panel').classList.add('open');
+        $('info-overlay').classList.add('open');
+    }
+    function closePanel() {
+        $('info-panel').classList.remove('open');
+        $('info-overlay').classList.remove('open');
+    }
+    $('open-info-btn').addEventListener('click', openPanel);
+    $('open-info-btn2').addEventListener('click', openPanel);
+    $('close-info').addEventListener('click', closePanel);
+    $('info-overlay').addEventListener('click', closePanel);
+
+    // ── Tabs ───────────────────────────────────────────────────────
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            $(`tab-${btn.dataset.tab}`).classList.add('active');
+        });
+    });
+
+    // ── File attach ────────────────────────────────────────────────
+    $('attach-file').addEventListener('click', () => $('chat-file').click());
+    $('chat-file').addEventListener('change', e => {
+        if (e.target.files.length) {
+            selectedFile = e.target.files[0];
+            $('file-name').textContent = selectedFile.name;
+            $('file-preview').classList.remove('hidden');
+        }
+    });
+    $('remove-file').addEventListener('click', () => {
+        selectedFile = null;
+        $('chat-file').value = '';
+        $('file-preview').classList.add('hidden');
+    });
+
+    // Auto-resize textarea
+    $('chat-message').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // ── Send message ───────────────────────────────────────────────
+    $('chat-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const input = $('chat-message');
+        const message = input.value.trim();
+        if (!message && !selectedFile) return;
+        try {
+            const fd = new FormData();
+            if (message) fd.append('message', message);
+            if (selectedFile) fd.append('file', selectedFile);
+            await authAPI.sendGroupMessage(groupId, fd);
+            input.value = '';
+            input.style.height = 'auto';
+            selectedFile = null;
+            $('chat-file').value = '';
+            $('file-preview').classList.add('hidden');
+            await loadMessages();
+        } catch (err) {
+            showToast(err.message || 'Failed to send', 'error');
+        }
+    });
+
+    // ── Init ───────────────────────────────────────────────────────
+    (async () => {
+        if (!groupId) { window.location.href = 'groups.html'; return; }
+        await loadGroupInfo();
+        await loadMessages();
+        setInterval(loadMessages, 3000);
+    })();
+</script>
+<script>
+    // Sidebar Toggle for Mobile
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const sidebarClose = document.getElementById('sidebar-close');
+
+    function toggleMenu() {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+
+    if (sidebarClose) sidebarClose.addEventListener('click', toggleMenu);
+    if (overlay) overlay.addEventListener('click', toggleMenu);
+</script>
+</body>
+</html>
