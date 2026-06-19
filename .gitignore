@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables (keep secrets safe!)
+.env
+.env.local
+.env.production
+
+# Uploaded files
+Mini Project/backend/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+.next/
+
+# VS Code
+.vscode/
